@@ -1,55 +1,30 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "private": true,
   "main": "index.js",
   "scripts": {
     "format": "prettier --write 'src/**/*.{js,ts,json,md}'",
     "lint": "eslint 'src/**/*.{js,ts}'",
-    "lint:fix": "eslint 'src/**/*.{js,ts}' --fix"
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "lint:fix": "eslint 'src/**/*.{js,ts}' --fix",
+    "start": "nodemon src/server.ts",
+    "build": "tsc",
+    "test": "jest",
+    "dev": "nodemon src/server.ts"
   },
   "eslintConfig": {
     "extends": [
-      "react-app",
-      "react-app/jest"
+      "eslint:recommended",
+      "plugin:@typescript-eslint/recommended"
     ]
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.16.7",
-    "@mapbox/mapbox-gl-directions": "^4.3.1",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
+    "@firebase/firestore": "^4.7.3",
     "express": "^4.21.1",
-    "firebase": "^10.11.0",
-    "firebase-admin": "^12.6.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-firebase-hooks": "^5.1.1",
-    "react-router-dom": "^6.22.1",
-    "react-scripts": "5.0.1",
-    "react-simple-star-rating": "^5.1.7",
-    "reactjs-popup": "^2.0.6",
-    "web-vitals": "^2.1.4"
+    "firebase": "^10.14.1",
+    "firebase-admin": "^12.6.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",

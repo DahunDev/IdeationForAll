@@ -1,4 +1,4 @@
-class User {
+export class User {
   private userId: string;
   private username: string;
   private email: string;
@@ -35,7 +35,7 @@ class User {
   public getUsername(): string {
     return this.username;
   }
-  
+
   public getEmail(): string {
     return this.email;
   }
@@ -59,7 +59,7 @@ class User {
   public getOwnedUngroupedPostItIds(): string[] {
     return this.ownedUngroupedPostItIds;
   }
-  
+
   /**
    * Updates the user's username.
    *
@@ -68,12 +68,11 @@ class User {
    *
    */
 
-  updateuserName(userName: string): boolean{
+  updateuserName(userName: string): boolean {
     this.username = userName;
     // Update in Firestore
     return true;
   }
-
 
   /**
    * Updates the user's password.
@@ -91,7 +90,6 @@ class User {
 
     return true;
   }
-
 
   addSharedBoard(boardId: string): boolean {
     if (!this.sharedBoardIds.includes(boardId)) {
@@ -130,6 +128,15 @@ class User {
     return false;
   }
 
+  
+  /**
+   * Updates the user's username.
+   *
+   * @param username - The new username to be set for the user.
+   * @returns `true` if the boardId was successfully removed from list (in both class and firestore)  `false` otherwise.
+   *
+   */
+
   removeSharedBoard(boardId: string): boolean {
     this.sharedBoardIds = this.sharedBoardIds.filter((id) => id !== boardId);
     // Save to Firestore
@@ -161,7 +168,6 @@ class User {
     if (!this.ownedBoardIds.includes(postItId)) {
       this.ownedBoardIds.push(postItId);
       // Save to Firestore
-
       return true;
     }
 
