@@ -14,7 +14,7 @@ async function resolveDocRef(docRef : any) {
 }
 
 
-async function getUserById(userId: string) {
+async function getUserByIdWithRefResovled(userId: string) {
     const userDoc = await db.collection("Users").doc(userId).get();
 
     if (!userDoc.exists) {
@@ -51,12 +51,13 @@ async function getUserById(userId: string) {
 }
 
 
-(async () => {
-    try {
-        const userId = "userIDExample"; // Replace this with a valid user ID
-        const userData = await getUserById(userId);
-        console.log("User Data:", userData);
-    } catch (error) {
-        console.error("Error fetching user:", error);
+async function getUserById(userId: string) {
+    const userDoc = await db.collection("Users").doc(userId).get();
+
+    if (!userDoc.exists) {
+        return null; // Return null if the document does not exist
     }
-})();
+
+    const userData = userDoc.data();
+    return userData;
+}
