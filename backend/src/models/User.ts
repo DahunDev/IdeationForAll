@@ -1,12 +1,14 @@
+import { BoardRef, PostItRef } from "../types/firestoreTypes";
+
 export class User {
   private userId: string;
   private username: string;
   private email: string;
   private password: string; // You should hash this before storing
   private accountSettingID: string; // Reference to account settings document
-  private sharedBoardIds: string[]; // Array of shared board IDs
-  private ownedBoardIds: string[]; // Array of owned board IDs
-  private ownedUngroupedPostItIds: string[]; // Array of owned ungrouped Post-It IDs
+  private sharedBoards: Array<BoardRef>; // Array of shared boards
+  private ownedBoards: Array<BoardRef>;// Array of owned boards
+  private ownedUnGroupedPostIts: Array<PostItRef>;// Array of owned ungrouped Post-Its
 
   constructor(
     userId: string,
@@ -14,19 +16,21 @@ export class User {
     email: string,
     password: string,
     accountSettingID: string,
-    sharedBoardIds: string[] = [],
-    ownedBoardIds: string[] = [],
-    ownedUngroupedPostItIds: string[] = [],
+    sharedBoards: Array<BoardRef> = [],
+    ownedBoards: Array<BoardRef> = [],
+    ownedUngroupedPostIts: Array<PostItRef> = [],
   ) {
     this.userId = userId;
     this.username = username;
     this.email = email;
     this.password = password;
     this.accountSettingID = accountSettingID;
-    this.sharedBoardIds = sharedBoardIds;
-    this.ownedBoardIds = ownedBoardIds;
-    this.ownedUngroupedPostItIds = ownedUngroupedPostItIds;
+    this.sharedBoards = sharedBoards || [];
+    this.ownedBoards = ownedBoards || [];
+    this.ownedUnGroupedPostIts = ownedUngroupedPostIts || [];
   }
+
+
 
   public getUserId(): string {
     return this.userId;
@@ -48,16 +52,16 @@ export class User {
     return this.accountSettingID;
   }
 
-  public getSharedBoardIds(): string[] {
-    return this.sharedBoardIds;
+  public getSharedBoards(): BoardRef[] {
+    return this.sharedBoards;
   }
 
-  public getOwnedBoardIds(): string[] {
-    return this.ownedBoardIds;
+  public getOwnedBoards(): BoardRef[] {
+    return this.ownedBoards;
   }
 
-  public getOwnedUngroupedPostItIds(): string[] {
-    return this.ownedUngroupedPostItIds;
+  public getOwnedUngroupedPostIts(): PostItRef[] {
+    return this.ownedUnGroupedPostIts;
   }
 
   /**
@@ -91,14 +95,16 @@ export class User {
     return true;
   }
 
-  addSharedBoard(boardId: string): boolean {
-    if (!this.sharedBoardIds.includes(boardId)) {
-      this.sharedBoardIds.push(boardId);
-      // Save to Firestore
-      return true;
+  addSharedBoard(board: BoardRef): boolean {
+
+    if (this.sharedBoards.some((ref) => ref.id === board.id)) {
+      return false; // Board already exists, so return false
     }
 
-    return false;
+    // If the board does not exist, add it to sharedBoards
+    this.sharedBoards.push(board);
+    // Save to Firestore
+    return true;
   }
 
   /**
@@ -137,40 +143,44 @@ export class User {
    *
    */
 
-  removeSharedBoard(boardId: string): boolean {
-    this.sharedBoardIds = this.sharedBoardIds.filter((id) => id !== boardId);
+  removeSharedBoard(board: BoardRef): boolean {
+    this.sharedBoards = this.sharedBoards.filter((ref) => ref.id !== board.id); //only includes item that id != id
     // Save to Firestore
-
     return true;
   }
 
-  addOwnedBoard(boardId: string): boolean {
-    if (!this.ownedBoardIds.includes(boardId)) {
-      this.ownedBoardIds.push(boardId);
-      // Save to Firestore
+  addOwnedBoard(board: BoardRef): boolean {
 
-      return true;
+   if (this.ownedBoards.some((ref) => ref.id === board.id)) {
+      return false; // Board already exists, so return false
     }
 
-    return false;
+    this.ownedBoards.push(board);
+
+
+    //Save to Firestore
+    return true;
   }
 
-  removeOwnedUngroupedPostItIds(postItId: string): boolean {
-    this.ownedUngroupedPostItIds = this.ownedUngroupedPostItIds.filter(
-      (id) => id !== postItId,
+  removeOwnedUngroupedPostItIds(postIt: PostItRef): boolean {
+    this.ownedUnGroupedPostIts = this.ownedUnGroupedPostIts.filter(
+      (ref) => ref.id !== postIt.id,
     );
+
+
     // Save to Firestore
 
     return true;
   }
 
-  addOwnedUngroupedPostItIds(postItId: string): boolean {
-    if (!this.ownedBoardIds.includes(postItId)) {
-      this.ownedBoardIds.push(postItId);
-      // Save to Firestore
-      return true;
+  addOwnedUngroupedPostItIds(postIt: PostItRef): boolean {
+    if (this.ownedUnGroupedPostIts.some((ref) => ref.id === postIt.id)) {
+      return false; // Board already exists, so return false
     }
 
-    return false;
+    this.ownedUnGroupedPostIts.push(postIt);
+
+    //save to firesotre
+    return true;
   }
 }
