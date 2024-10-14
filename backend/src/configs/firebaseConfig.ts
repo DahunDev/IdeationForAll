@@ -1,14 +1,16 @@
 // src/firebaseConfig.ts
 
-import admin from "firebase-admin";
+import admin, { ServiceAccount } from "firebase-admin";
 // Path to your service account key file
-const serviceAccount = require("./serviceAccountKey.json");
+import serviceAccount from "./serviceAccountKey.json";
+
+const serviceAccountConfig = serviceAccount as ServiceAccount;
 
 // Initialize Firebase Admin SDK
 if (!admin.apps.length) {
     admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
-        databaseURL: "https://your-database-name.firebaseio.com", // Replace with your database URL
+        credential: admin.credential.cert(serviceAccountConfig),
+        // databaseURL: "https://your-database-name.firebaseio.com", // Replace with your database URL
     });
 }
 
