@@ -1,14 +1,17 @@
-import express from 'express';
+// src/app.ts
+import express, { Application } from 'express';
+import authRoutes from './routes/authRoutes';
 
-const app = express();
+const app: Application = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json()); // Middleware to parse JSON bodies
+// Middleware to parse JSON bodies
+app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
+// Routes
+app.use('/api/auth', authRoutes);
 
+// Start the server
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });

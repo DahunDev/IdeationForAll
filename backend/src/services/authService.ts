@@ -3,9 +3,10 @@ import { authAdmin, db } from '../configs/firebaseConfig'
 interface UserRegistration {
   email: string;
   password: string;
+  username: string;
 }
 
-export const registerUser = async ({ email, password }: UserRegistration): Promise<string> => {
+export const registerUser = async ({ email, password, username }: UserRegistration): Promise<string> => {
   try {
     // Create user with Firebase Admin Authentication
     const userRecord = await authAdmin.createUser({
@@ -16,9 +17,10 @@ export const registerUser = async ({ email, password }: UserRegistration): Promi
     const uid = userRecord.uid;
 
     // Add user data to Firestore
-    await db.collection('users').doc(uid).set({
+    await db.collection('Users').doc(uid).set({
       email: userRecord.email,
       createdAt: new Date(),
+      username: username,
       role: 'user' // example default field
     });
 
