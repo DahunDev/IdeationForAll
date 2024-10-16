@@ -1,0 +1,67 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #ffffff;
+    text-align: center;
+    margin: auto;
+}
+
+.head_container {
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    justify-content: space-between;
+    background-color: deepskyblue;
+}
+
+.options_container {
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    justify-content: flex-start;
+    background-color: deepskyblue;
+}
+
+.workspace_container {
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    justify-content: flex-start;
+    background-color: gray;
+    border: 3px solid black;
+}
+
+.workspace_button {
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: yellow;
+    color: black;
+    margin: 10px;
+}
+
+.titletext {
+    padding: 9px;
+    font-size: 18px;
+}
+
+.account_button {
+    align-items: center;
+    justify-content: center;
+    padding: 2px 35px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: gray;
+    color: black;
+}
+
+.save_or_share_button {
+    align-items: center;
+    justify-content: center;
+    padding: 10px 35px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: gray;
+    color: black;
+}
