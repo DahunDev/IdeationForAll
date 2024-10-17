@@ -28,9 +28,9 @@ export const registerUser = async ({ email, password, username }: UserRegistrati
 } catch (error: unknown) { // Specify 'unknown' type
     // Type assertion to 'Error' to access message
     if (error instanceof Error) {
-      throw new Error(`Failed to register user: ${error.message}`);
+      throw new Error(`${error.message}`);
     } else {
-      throw new Error(`Failed to register user: ${String(error)}`); // Fallback for unknown error types
+      throw new Error(`${String(error)}`); // Fallback for unknown error types
     }
   }
 };
