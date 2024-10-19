@@ -20,7 +20,7 @@ const ResetPassword = () => {
 		     
 	 
 	 else{
-		 const url = process.env.REACT_APP_BACKEND_URL + "/api/resetPassword";
+		 //const url = process.env.REACT_APP_BACKEND_URL + "/api/resetPassword";
 		 const res = await.axios.post(url, {password: updatedPassword, token: token, userId: userId,
 		 });
 		 if(res.data.success === false){
