@@ -31,10 +31,31 @@ const ResetPassword = () => {
 		 }, 2000);
 	 }
 	 }
-};
+
 
 return(
-
+<h1>Reset Password</h1>
+<form onSubmit=[handleSubmit}>
+<div>
+<label htmlFor="newpassword">New Password</label>
+<input
+    type="password"
+	id="newpassword"
+	name="newpassword"
+	required
+	/>
+	</div>
+	<div>
+	<label htmlFor="confirmpassword">Confirm New Password</label>
+	<input
+	    type="password"
+		id="cofnrimpassword"
+		name="confirmpassword"
+		required
+		/>
+		</div>
+		<button type="submit">Submit</button>
+		</form>
 );
-
+};
 export default ResetPassword;
