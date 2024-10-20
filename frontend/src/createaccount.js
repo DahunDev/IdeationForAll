@@ -2,8 +2,8 @@ import React, {userState} from 'react'
 
 const CreateAccount = () => {
   const [username, setUsername] = 
-useState(");
- const [message, setMessage] = useState(");
+useState("");
+ const [message, setMessage] = useState("");
 
 const handleCreateAccount = async () => {
  try {
@@ -17,10 +17,10 @@ fetch('http://localhost:3000/api/api/auth/register',{
         });
 
         if(response.ok){
-           setMessage('Account created successfully!");
+           setMessage("Account created successfully!");
 		} else{
            const errorData = await response.json();
-           setMessage(Error: ${errorData.message});
+           setMessage("Error:", $(errorData.message));
 		}
  }catch(error){
   setMessage('An error occurred. Please try again.');
