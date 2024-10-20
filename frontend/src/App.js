@@ -4,13 +4,14 @@ import RegisterPage from './components/RegisterPage';
 
 function App() {
   return (
-    <div className="App">
-      {/* <header className="App-header">
-      </header> */}
-      <div>
-         <RegisterPage /> {/* Use the RegisterPage component */}
-       </div>
-    </div>    
+    <Router>
+      <div className="App">
+        <Routes>
+          <Route path="/register" element={<RegisterPage />} />
+          {/* Add other routes here */}
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
