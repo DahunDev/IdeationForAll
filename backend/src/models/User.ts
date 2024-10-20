@@ -7,8 +7,8 @@ export class User {
   private password: string; // You should hash this before storing
   private accountSettingID: string; // Reference to account settings document
   private sharedBoards: Array<BoardRef>; // Array of shared boards
-  private ownedBoards: Array<BoardRef>;// Array of owned boards
-  private ownedUnGroupedPostIts: Array<PostItRef>;// Array of owned ungrouped Post-Its
+  private ownedBoards: Array<BoardRef>; // Array of owned boards
+  private ownedUnGroupedPostIts: Array<PostItRef>; // Array of owned ungrouped Post-Its
 
   constructor(
     userId: string,
@@ -29,8 +29,6 @@ export class User {
     this.ownedBoards = ownedBoards || [];
     this.ownedUnGroupedPostIts = ownedUngroupedPostIts || [];
   }
-
-
 
   public getUserId(): string {
     return this.userId;
@@ -96,7 +94,6 @@ export class User {
   }
 
   addSharedBoard(board: BoardRef): boolean {
-
     if (this.sharedBoards.some((ref) => ref.id === board.id)) {
       return false; // Board already exists, so return false
     }
@@ -134,7 +131,6 @@ export class User {
     return false;
   }
 
-  
   /**
    * Updates the user's username.
    *
@@ -150,13 +146,11 @@ export class User {
   }
 
   addOwnedBoard(board: BoardRef): boolean {
-
-   if (this.ownedBoards.some((ref) => ref.id === board.id)) {
+    if (this.ownedBoards.some((ref) => ref.id === board.id)) {
       return false; // Board already exists, so return false
     }
 
     this.ownedBoards.push(board);
-
 
     //Save to Firestore
     return true;
@@ -166,7 +160,6 @@ export class User {
     this.ownedUnGroupedPostIts = this.ownedUnGroupedPostIts.filter(
       (ref) => ref.id !== postIt.id,
     );
-
 
     // Save to Firestore
 

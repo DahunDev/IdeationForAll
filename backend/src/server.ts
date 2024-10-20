@@ -1,11 +1,10 @@
 // src/app.ts
-import express, { Application } from 'express';
-import authRoutes from './routes/authRoutes';
-const cors = require('cors');
+import express, { Application } from "express";
+import authRoutes from "./routes/authRoutes";
+const cors = require("cors");
 
 const app: Application = express();
 const PORT = process.env.PORT || 8080;
-
 
 // Enable CORS for all origins
 app.use(cors());
@@ -14,7 +13,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use('/api/auth', authRoutes);
+app.use("/api/auth", authRoutes);
 
 // Start the server
 app.listen(PORT, () => {
