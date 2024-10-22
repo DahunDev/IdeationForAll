@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import './RegisterPage.css';
+import { Link, Navigate } from 'react-router-dom';
 
 const RegisterPage = () => {
     const [email, setEmail] = useState('');
@@ -33,6 +34,7 @@ const RegisterPage = () => {
             // Handle successful registration
             if (response.status === 201) {
                 setSuccess('Registration successful! Please log in.');
+                // Navigate("/login");
             }
         } catch (err) {
             // Handle error response
@@ -79,7 +81,13 @@ const RegisterPage = () => {
                 <button type="submit">Create Account</button>
             </form>
             {error && <p style={{ color: 'red' }}>{error}</p>}
-            {success && <p style={{ color: 'green' }}>{success}</p>}
+
+            {/* Update the success message to include the link to the login page */}
+            {success && (
+                <p style={{ color: 'green' }}>
+                    {success} <Link to="/login">Log in</Link>.
+                </p>
+            )}
         </div>
     );
 };

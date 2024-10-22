@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { auth } from "../configs/firebaseConfig";
 import { browserSessionPersistence, getAuth, sendPasswordResetEmail, setPersistence, signInWithEmailAndPassword } from "firebase/auth";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import "./loginPage.css"
 
 const LoginPage = () => {
@@ -25,7 +25,6 @@ const LoginPage = () => {
       }).catch((signInError) => {
         // Handle other errors that may occur during signInWithEmailAndPassword
         const errorCode = signInError.code;
-        const errorMessage = signInError.message;
 
         console.log(errorCode);
     
@@ -71,6 +70,23 @@ const LoginPage = () => {
           required
         />
         <button type="submit">Login</button>
+        <aside className="goto-forget-password">
+        <a 
+          className="goto-login-item" 
+          id="resetPW-button2" 
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            resetPassword(email);
+          }}
+          style={{ marginRight: '15px' }} // Add space between the two links
+        >
+          Forgot Username/Password?
+        </a>
+        <a href="/register">Register New Account</a>
+      </aside>
+
+
         <div id="login-fail">
           <p id="login-fail-message"></p>
         </div>     
@@ -86,7 +102,8 @@ const LoginPage = () => {
 export const resetPassword = (email) => {
   const auth = getAuth();
   
-  if(!email) {
+  if(!email || email.length === 0) {
+    alert("To reset password, must need to enter email address.");
     return;
   }
 
