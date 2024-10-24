@@ -2,16 +2,18 @@
 import { Request, Response } from "express";
 import { AuthenticatedRequest } from "../types/customTypes";
 import { db, firebaseAdmin } from "../configs/firebaseConfig"; // Assume db is your Firestore instance
-export const createBoard = async (req: AuthenticatedRequest, res: Response) => {
+export const createBoard = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const userId = req.user?.uid; // Retrieve the UID from the authenticated request
   const { boardName } = req.body; // Extract boardName from the request body
 
   if (!userId) {
-    return res.status(401).json({ message: "Unauthorized" });
+    res.status(401).json({ message: "Unauthorized" });
+    return;
   }
 
   if (!boardName) {
-    return res.status(400).json({ message: "Board name is required" });
+    res.status(400).json({ message: "Board name is required" });
+    return;
   }
 
   try {
@@ -50,11 +52,15 @@ export const createBoard = async (req: AuthenticatedRequest, res: Response) => {
       postItIds: [], // Start with an empty array for post-it IDs
     });
 
-    return res
+    res
       .status(201)
       .json({ message: "Board created successfully", boardId });
+      return;
+
   } catch (error) {
     console.error("Error creating board:", error);
-    return res.status(500).json({ message: "Failed to create board" });
+    res.status(500).json({ message: "Failed to create board" });
+    return;
+
   }
 };

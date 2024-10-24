@@ -1,6 +1,8 @@
 // src/app.ts
 import express, { Application } from "express";
 import authRoutes from "./routes/authRoutes";
+import boardRoutes from "./routes/boardRoutes";
+
 const cors = require("cors");
 
 const app: Application = express();
@@ -14,6 +16,7 @@ app.use(express.json());
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/board", boardRoutes)
 
 // Start the server
 app.listen(PORT, () => {

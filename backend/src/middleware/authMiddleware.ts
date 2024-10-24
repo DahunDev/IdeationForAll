@@ -6,11 +6,12 @@ export const authenticateUser = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction,
-) => {
+): Promise<void> => {  // Change the return type to Promise<void>
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ message: "Unauthorized" });
+    res.status(401).json({ message: "Unauthorized" });
+    return;
   }
 
   const idToken = authHeader.split("Bearer ")[1];
@@ -22,8 +23,8 @@ export const authenticateUser = async (
       email: decodedToken.email,
       displayName: decodedToken.displayName,
     };
-    next();
+    next();  // Call next() to proceed to the next middleware
   } catch (error) {
-    return res.status(401).json({ message: "Unauthorized" });
+    res.status(401).json({ message: "Unauthorized" });
   }
 };
