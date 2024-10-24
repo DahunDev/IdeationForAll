@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './RegisterPage.css';
 import { Link, Navigate } from 'react-router-dom';
+import { getBackendUrl } from '../configs/serverSettings';
 
 const RegisterPage = () => {
     const [email, setEmail] = useState('');
@@ -25,7 +26,13 @@ const RegisterPage = () => {
         }
 
         try {
-            const response = await axios.post('http://localhost:8080/api/auth/register', {
+            const backendUrl = getBackendUrl();
+            if (!backendUrl) {
+                throw new Error('Backend URL is not set. Make sure server settings are loaded.');
+              }
+          
+            
+            const response = await axios.post(`${backendUrl}/api/auth/register`, {
                 username,
                 email,
                 password,
