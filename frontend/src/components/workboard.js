@@ -1,11 +1,28 @@
+import { useState } from "react"
 import { useNavigate } from "react-router-dom";
 import "./workboard.css";
+import PostIt from "./functions/PostIts"
 
 const Workboard = () => {
+    const [postits, setPostits] = useState([])
     const navigate = useNavigate();
+
 
     const accountPageNav = () => {
         navigate("/workspace");       // TO DO: Change Navigate link to edit account page once fully functional
+    }
+
+    const addNote = () => {
+        setPostits([
+            ...postits,
+            {
+                id: Date.now(),
+            },
+        ])
+    }
+
+    const deletePostit = (postitId) => {
+        setPostits(postits.filter(item => item.id !== postitId))
     }
 
 
@@ -25,11 +42,14 @@ const Workboard = () => {
                         <button class="save_or_share_button">Share</button>
                     </div>
                     <div class="workspace_container">
-                        <button class="workspace_button">Create new post-it</button>
+                        <button class="workspace_button" onClick={addNote}>Create new post-it</button>
                         <button class="workspace_button">Create vote</button>
                         <button class="workspace_button">Groups</button>
                         <button class="workspace_button">People: 1</button>
                     </div>
+                    {postits.map((item) => (
+                        <PostIt key={item.id} onClose={() => deletePostit(item.id)} />
+                    ))}
                 </div>
         </body>
         </html>
