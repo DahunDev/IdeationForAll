@@ -78,3 +78,40 @@ export const createPostIt = async (req: AuthenticatedRequest, res: Response): Pr
     res.status(500).json({ message: "Failed to create Post-It" });
   }
 };
+
+
+export const deletePostIt = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  const userId = req.user?.uid; // Retrieve the UID from the authenticated request
+  const { postItId } = req.body; // Extract boardName from the request body
+
+
+  if (!userId) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
+  if (!postItId) {
+    res.status(400).json({ message: "boardId name is required" });
+    return;
+  }
+
+
+}
+
+export const updatePostItGroup = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
+  const userId = req.user?.uid; // Retrieve the UID from the authenticated request
+  const { postItId, boardID, groupID } = req.body; // Extract boardName from the request body
+
+
+  if (!userId) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
+  if (!postItId) {
+    res.status(400).json({ message: "boardId name is required" });
+    return;
+  }
+
+
+}

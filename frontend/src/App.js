@@ -3,7 +3,7 @@ import './App.css';
 import RegisterPage from './components/RegisterPage';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from './components/loginPage';
-import { useEffect, useState } from 'react';
+import Workboard from './components/workboard';
 import { getBackendUrl, loadServerSettings } from './configs/serverSettings';
 
 function App() {
@@ -27,7 +27,7 @@ function App() {
         <Routes>
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/workspace" element={<RegisterPage />} />
+          <Route path="/workspace" element={<Workboard />} />
 
           {/* Add other routes here */}
         </Routes>
