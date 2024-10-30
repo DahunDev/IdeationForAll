@@ -41,7 +41,7 @@ const RegisterPage = () => {
             // Handle successful registration
             if (response.status === 201) {
                 setSuccess('Registration successful! Please log in.');
-                // Navigate("/login");
+                Navigate("/login");
             }
         } catch (err) {
             // Handle error response
