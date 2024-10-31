@@ -1,53 +1,95 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { auth } from "../configs/firebaseConfig";
-import { browserSessionPersistence, getAuth, sendPasswordResetEmail, setPersistence, signInWithEmailAndPassword } from "firebase/auth";
-import { Navigate } from "react-router-dom";
+import { browserSessionPersistence, getAuth, onAuthStateChanged, sendPasswordResetEmail, setPersistence, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { Navigate, useNavigate } from "react-router-dom";
 import "./loginPage.css"
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const [prompted, setPrompted] = useState(false); // Track if prompt has been shown
+
+  const [isLoggingIn, setIsLoggingIn] = useState(false); // Flag to check if user is logging in
+  const [LoggedInByManually, setLoggedInByManually] = useState(false); // Flag to check if user is logging in
+  const [isFirst, setIsFirst] = useState(true); // Use state to track if it's the first time checking auth
+
+  useEffect(() => {
+    const checkAuth = onAuthStateChanged(auth, (user) => {
+      setIsFirst(false);
+        if (user && isFirst) {
+          // User is logged in
+          const confirmLogout = window.confirm("You are already logged in. Do you want to log out?");
+          setPrompted(true); // Mark as prompted to avoid infinite loop
+          if (confirmLogout) {
+            // User chose to log out
+            signOut(auth)
+              .then(() => {
+                console.log("User logged out successfully.");
+                setPrompted(false); // Reset prompted after logout to allow prompt on next login
+                // Optional: Redirect to the login page or show a message
+              })
+              .catch((error) => {
+                console.error("Error logging out:", error);
+              });
+          } else {
+            // User chose to stay logged in
+            console.log("User chose to stay logged in.");
+            setPrompted(true);
+            navigate("/workspace"); // Redirect to workspace or dashboard
+          }
+        } else {
+          // No user is logged in
+          console.log("No user is logged in.");
+        }
+      });
+      return () => checkAuth();
+  }, [auth, navigate, prompted, isFirst]);
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setIsLoggingIn(true); // Set logging in flag to true
+
     setPersistence(auth, browserSessionPersistence)
-    .then(() => {
-      // Existing and future Auth states are now persisted in the current
-      // session only. Closing the window would clear any existing state even
-      // Proceed to sign in after setting persistence
-      signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
-        // Signed in
-   
-        const user = userCredential.user;
-        document.getElementById("login-fail").style.display = "none";
-        Navigate("/workspace");
-
-      }).catch((signInError) => {
-        // Handle other errors that may occur during signInWithEmailAndPassword
-        const errorCode = signInError.code;
-
-        console.log(errorCode);
-    
-        if (errorCode === "auth/invalid-email") {
-          document.getElementById("login-fail-message").innerText = "Invalid email.";
-          document.getElementById("login-fail").style.display = "block";
-        } else if (errorCode === "auth/invalid-credential") {
-          document.getElementById("login-fail-message").innerText = "Failed to login, make sure email and password are correct";
-          document.getElementById("login-fail").style.display = "block";
-        } else {
-          document.getElementById("login-fail-message").innerText = "Error occurred. Try again.";
-          document.getElementById("login-fail").style.display = "block";
-          console.log("Error occurred. Try again.");
-          console.log(`${errorCode}`);
-        }
+      .then(() => {
+        signInWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+            if (userCredential && userCredential.user) {
+              setPrompted(true);
+              setLoggedInByManually(true);
+              const user = userCredential.user;
+              document.getElementById("login-fail").style.display = "none";
+              navigate("/workspace");
+            } else {
+              // Handle case where userCredential or user is missing
+              console.error("Unexpected login failure, no user credential returned.");
+              document.getElementById("login-fail-message").innerText = "Login failed. Please try again.";
+              document.getElementById("login-fail").style.display = "block";
+            }
+          })
+          .catch((signInError) => {
+            const errorCode = signInError?.code || "unknown-error";
+            console.log("Error Code:", errorCode);
+  
+            if (errorCode === "auth/invalid-email") {
+              document.getElementById("login-fail-message").innerText = "Invalid email.";
+            } else if (errorCode === "auth/invalid-credential") {
+              document.getElementById("login-fail-message").innerText = "Failed to login, make sure email and password are correct.";
+            } else {
+              document.getElementById("login-fail-message").innerText = "Error occurred. Try again.";
+            }
+            document.getElementById("login-fail").style.display = "block";
+          });
       })
-    }).catch((setPersistenceError) => {
-      // Handle errors from setPersistence
-      console.error("Error setting persistence:", setPersistenceError);
-    
-      // You may want to provide feedback to the user or take appropriate action.
-      document.getElementById("login-fail-message").innerText = "Error setting persistence. Try again.";
-      document.getElementById("login-fail").style.display = "block";
+      .catch((setPersistenceError) => {
+        console.log("Persistence error:", setPersistenceError);
+        const errorCode = setPersistenceError?.code || "unknown-persistence-error";
+        document.getElementById("login-fail-message").innerText = "Error setting persistence. Try again.";
+        document.getElementById("login-fail").style.display = "block";
+        console.log("Error Code:", errorCode);
+      }).finally(() => {
+        setIsLoggingIn(false); // Reset logging in flag
     });
   };
 
@@ -116,7 +158,7 @@ export const resetPassword = (email) => {
     })
     .catch((error) => {
       const errorCode = error.code;
-      const errorMessage = error.message;
+      // const errorMessage = error.message;
     if(errorCode === "auth/missing-email"){
       alert("To reset password, must enter email address.");
       return;

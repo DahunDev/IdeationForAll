@@ -1,11 +1,25 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import "./workboard.css";
 import PostIt from "./functions/PostIts"
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../configs/firebaseConfig";
 
 const Workboard = () => {
     const [postits, setPostits] = useState([])
     const navigate = useNavigate();
+
+    useEffect(() => {
+        // Check if user is logged in
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                navigate('/login'); // Redirect to login if not logged in
+            }else{
+                console.log(user);
+            }
+        });
+    }, [navigate]);
+
 
 
     const accountPageNav = () => {
@@ -24,6 +38,9 @@ const Workboard = () => {
     const deletePostit = (postitId) => {
         setPostits(postits.filter(item => item.id !== postitId))
     }
+
+
+
 
 
     return (
