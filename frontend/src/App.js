@@ -1,14 +1,14 @@
 // import logo from './logo.svg';
-import './App.css';
-import RegisterPage from './components/RegisterPage';
+import "./App.css";
+import RegisterPage from "./components/RegisterPage";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import LoginPage from './components/loginPage';
-import Workboard from './components/workboard';
-import { getBackendUrl, loadServerSettings } from './configs/serverSettings';
-import { useEffect, useState } from 'react';
+import LoginPage from "./components/loginPage";
+import Workboard from "./components/workboard";
+import { getBackendUrl, loadServerSettings } from "./configs/serverSettings";
+import { useEffect, useState } from "react";
 
 function App() {
-  const [backendUrl, setBackendUrl] = useState('');
+  const [backendUrl, setBackendUrl] = useState("");
 
   // Load server settings on app start
   useEffect(() => {
@@ -20,7 +20,6 @@ function App() {
     }
     fetchSettings();
   }, []);
-
 
   return (
     <Router>
