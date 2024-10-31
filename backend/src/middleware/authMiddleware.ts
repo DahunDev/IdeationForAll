@@ -6,7 +6,8 @@ export const authenticateUser = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction,
-): Promise<void> => {  // Change the return type to Promise<void>
+): Promise<void> => {
+  // Change the return type to Promise<void>
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -23,7 +24,7 @@ export const authenticateUser = async (
       email: decodedToken.email,
       displayName: decodedToken.displayName,
     };
-    next();  // Call next() to proceed to the next middleware
+    next(); // Call next() to proceed to the next middleware
   } catch (error) {
     res.status(401).json({ message: "Unauthorized" });
   }
