@@ -6,6 +6,8 @@ import LoginPage from "./components/loginPage";
 import Workboard from "./components/workboard";
 import { getBackendUrl, loadServerSettings } from "./configs/serverSettings";
 import { useEffect, useState } from "react";
+import TestPage from "./components/testPage";
+import EditAccountPage from "./components/editAccountPage";
 
 function App() {
   const [backendUrl, setBackendUrl] = useState("");
@@ -28,7 +30,9 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/workspace" element={<Workboard />} />
-
+          <Route path="/edit-account" element={<EditAccountPage />} />
+          <Route path="/test" element={<TestPage />} />{" "}
+          {/* Add TestPage route */}
           {/* Add other routes here */}
         </Routes>
       </div>
