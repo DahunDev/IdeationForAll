@@ -15,11 +15,9 @@ export const registerUserController = async (
     if (error instanceof Error) {
       // Handle specific Firebase error for email already in use
       if (error.message.includes("email address is already in use")) {
-        res
-          .status(400)
-          .json({
-            message: "The email address is already in use by another account.",
-          });
+        res.status(400).json({
+          message: "The email address is already in use by another account.",
+        });
       } else if (
         error.message.includes("the email address is improperly formatted")
       ) {
@@ -36,4 +34,3 @@ export const registerUserController = async (
     }
   }
 };
-
