@@ -140,7 +140,7 @@ export const updateEmail = async (
       await userRef.update({ email: newEmail });
         res
         .status(200)
-        .json({ message: "Successfully updated email." });
+        .json({ message: "Email updated successfully. Due to secruity policy, need to sign in again!" });
       return;
     } catch (firestoreError) {
       // If Firestore update fails, revert the email in Firebase Authentication

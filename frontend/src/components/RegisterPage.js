@@ -42,10 +42,10 @@ const RegisterPage = () => {
       // Handle successful registration
       if (response.status === 201) {
         setSuccess("Registration successful! Please log in.");
-        Navigate("/login");
       }
     } catch (err) {
       // Handle error response
+      console.log(err);
       setError(
         err.response?.data?.message || "Registration failed. Please try again.",
       );

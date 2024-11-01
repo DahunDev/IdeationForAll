@@ -7,7 +7,7 @@ export const createPostIt = async (
   res: Response,
 ): Promise<void> => {
   const userId = req.user?.uid; // Retrieve the UID from the authenticated request
-  const { name, boardId, content, position } = req.body; // Extract boardName from the request body
+  const { name, boardId, content, position, size } = req.body; // Extract boardName from the request body
 
   if (!userId) {
     res.status(401).json({ message: "Unauthorized" });
@@ -59,11 +59,13 @@ export const createPostIt = async (
       postItId,
       associatedBoardID: boardId,
       name,
+      font: "",
       posterUserID: userId,
       content: content || "", // If content is provided, use it, otherwise set it to an empty string
-      votes: 0, // Start with 0 votes
       associatedGroups: [], // No group assignment, so leave this empty
       position: position || { x: 0, y: 0 }, // Default position (if not provided)
+      size: size || { width: 100, height: 250 }, // Default size
+
     };
 
     // Add the Post-It creation to the batch

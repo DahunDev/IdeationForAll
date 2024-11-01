@@ -80,8 +80,8 @@ const EditAccountPage = () => {
         },
       );
       // console.log("Full response:", response);
-
-      alert(response.data.message || "Email updated successfully!");
+          // Refresh token after updating email
+      alert(response.data.message || "Email updated successfully. Due to secruity policy, need to sign in again!");
     } catch (error) {
       console.error("Error updating email:", error);
       alert(error.response?.data?.message || "Failed to update email");
