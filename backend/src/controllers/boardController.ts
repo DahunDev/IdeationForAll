@@ -229,3 +229,84 @@ export const createGroup = async (
     return;
   }
 };
+
+export const deleteGroup = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
+  const userId = req.user?.uid; // Retrieve the UID from the authenticated request
+  const { boardId, groupId } = req.body; // Extract boardId and groupId from the request body
+
+  if (!userId) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
+  if (!boardId) {
+    res.status(400).json({ message: "BoardId is required" });
+    return;
+  }
+
+  if (!groupId) {
+    res.status(400).json({ message: "groupId is required" });
+    return;
+  }
+
+  try {
+    const boardRef = firebaseAdmin.firestore().collection("Boards").doc(boardId);
+    const boardDoc = await boardRef.get();
+
+    if (!boardDoc.exists) {
+      res.status(404).json({ message: "Board not found" });
+      return;
+    }
+
+    const boardData = boardDoc.data();
+    if (!boardData) {
+      res.status(404).json({ message: "Board data is undefined" });
+      return;
+    }
+
+    // Check if the user is authorized to delete the group
+    if (
+      boardData.workspaceOrganizerId !== userId &&
+      !boardData.SharedUserIds.includes(userId)
+    ) {
+      res.status(403).json({ message: "Access denied" });
+      return;
+    }
+
+    // Start a Firestore batch operation
+    const batch = firebaseAdmin.firestore().batch();
+
+    // Step 1: Get all post-its in the group
+    const groupRef = boardRef.collection("Groups").doc(groupId);
+    const groupDoc = await groupRef.get();
+
+    if (!groupDoc.exists) {
+      res.status(404).json({ message: "Group not found" });
+      return;
+    }
+
+    const groupData = groupDoc.data();
+    const postItRefs: firebaseAdmin.firestore.DocumentReference[] = groupData?.postIts || []; // Define postItRefs as an array of DocumentReference
+
+    // Step 2: Move all associated post-its to ungrouped
+    postItRefs.forEach((postItRef: firebaseAdmin.firestore.DocumentReference) => {
+      batch.update(postItRef, {
+        groupId: firebaseAdmin.firestore.FieldValue.delete(), // Remove the groupId to ungroup
+      });
+    });
+
+    // Step 3: Delete the group
+    batch.delete(groupRef);
+
+    // Step 4: Commit the batch
+    await batch.commit();
+
+    res.status(200).json({ message: "Group deleted successfully", groupId });
+  } catch (error) {
+    console.error("Error deleting group:", error);
+    res.status(500).json({ message: "Failed to delete group" });
+  }
+};
