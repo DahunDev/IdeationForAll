@@ -2,6 +2,10 @@
 import { Request, Response } from "express";
 import { AuthenticatedRequest } from "../types/customTypes";
 import { db, firebaseAdmin } from "../configs/firebaseConfig"; // Assume db is your Firestore instance
+
+
+
+
 export const createBoard = async (
   req: AuthenticatedRequest,
   res: Response,
@@ -151,6 +155,77 @@ export const getBoard = async (
   } catch (error) {
     console.error("Error retrieving board data:", error);
     res.status(500).json({ message: "Failed to get board data" });
+    return;
+  }
+};
+
+
+
+export const createGroup = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
+  const userId = req.user?.uid; // Retrieve the UID from the authenticated request
+  const { boardId, groupName } = req.body; // Extract boardName from the request body
+
+  if (!userId) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
+  if (!boardId) {
+    res.status(400).json({ message: "BoardId is required" });
+    return;
+  }
+
+  if (!groupName) {
+    res.status(400).json({ message: "groupName is required" });
+    return;
+  }
+
+  try {
+    const boardRef = db.collection("Boards").doc(boardId);
+    const boardDoc = await boardRef.get();
+
+    if (!boardDoc.exists) {
+      res.status(404).json({ message: "Board not found" });
+      return;
+    }
+
+    const boardData = boardDoc.data();
+    // Ensure boardData is defined
+    if (!boardData) {
+      res.status(404).json({ message: "Board data is undefined" });
+      return;
+    }
+
+    if (
+      boardData.workspaceOrganizerId !== userId &&
+      !boardData.SharedUserIds.includes(userId)
+    ) {
+      res.status(403).json({ message: "Access denied" });
+      return;
+    }
+
+    // Generate a unique ID for the new group
+    const newGroupRef = boardRef.collection("Groups").doc();
+    const groupId = newGroupRef.id;
+
+  // Create the new group document
+  await newGroupRef.set({
+    groupId,
+    title: groupName,
+    postIts: [], // Initialize with an empty array
+    upvotedUsers: [],
+    downvotedUsers: [],
+    upvotes: 0
+  });
+
+    res.status(201).json({ message: "Group created successfully", groupId });
+    return;
+  } catch (error) {
+    console.error("Error creating board:", error);
+    res.status(500).json({ message: "Failed to create Group" });
     return;
   }
 };
