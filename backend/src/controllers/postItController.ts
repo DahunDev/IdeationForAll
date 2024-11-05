@@ -261,3 +261,73 @@ export const updatePostItGroup = async (
     res.status(500).json({ message: "Failed to move PostIt" });
   }
 };
+
+
+export const updatePostItFont = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
+  const userId = req.user?.uid;
+  const { postItId, font } = req.body; // targetGroupId is null if moving to ungrouped
+
+  if (!userId) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
+  if (!postItId) {
+    res.status(400).json({ message: "postItId is required" });
+    return;
+  }
+
+  try {
+    const postItRef = db.collection("PostIts").doc(postItId);
+    const postItDoc = await postItRef.get();
+
+    if (!postItDoc.exists) {
+      res.status(404).json({ message: "PostIt not found" });
+      return;
+    }
+
+    if (!postItDoc || !postItDoc.exists) {
+      res.status(404).json({ message: "PostIt not found" });
+      return;
+    }
+
+    const postItData = postItDoc.data();
+    const boardId = postItData?.associatedBoardID;
+
+    if (!boardId) {
+      res
+        .status(500)
+        .json({ message: "Associated board ID is missing in PostIt data" });
+      return;
+    }
+
+    // Retrieve the associated board document to check for board ownership
+    const boardRef = db.collection("Boards").doc(boardId);
+    const boardDoc = await boardRef.get();
+
+    if (!boardDoc.exists) {
+      res.status(404).json({ message: "Associated board not found" });
+      return;
+    }
+
+    const boardData = boardDoc.data();
+    const boardOwnerId = boardData?.workspaceOrganizerId;
+    const postItOwnerId = postItData?.posterUserID;
+
+    // Check if the current user is either the PostIt owner or the board owner
+    if (userId !== postItOwnerId && userId !== boardOwnerId) {
+      res
+        .status(403)
+        .json({ message: "You do not have permission to edit font for this PostIt" });
+      return;
+    }
+    await postItRef.update({ font: font });
+    res.status(200).json({ message: "PostIt font updated successfully" });
+  } catch (error) {
+    console.error("Error moving PostIt:", error);
+    res.status(500).json({ message: "Failed to updated PostIt font" });
+  }
+};

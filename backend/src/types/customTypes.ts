@@ -24,18 +24,10 @@ export interface Size {
   height: number;
 }
 
-export interface PostItUpdate {
-  position?: Position;
-  size?: Size;
+export type PostItUpdateData = {
+  postItId: string;
   content?: string;
-  name?: string;
-  font?: string;
-}
-
-export interface ValidPostItUpdate extends PostItUpdate {
-  position?: Position;
-  size?: Size;
-  content?: string;
-  name?: string;
-  font?: string;
-}
+  position?: { x: number; y: number };
+  size?: { width: number; height: number };
+  userId: string;
+};

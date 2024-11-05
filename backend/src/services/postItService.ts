@@ -1,6 +1,4 @@
-import { firebaseAdmin } from "../configs/firebaseConfig";//-
-import { PostItUpdate } from "../types/customTypes";
-//-
+import { db, firebaseAdmin } from "../configs/firebaseConfig";//-
 
 
 export const getPostItIfExists = async (postItId: string): Promise<FirebaseFirestore.DocumentSnapshot | null> => {
@@ -65,47 +63,17 @@ async function isUserAuthorized( userId: string, postItDoc: FirebaseFirestore.Do
   }
 }
 
-function validatePostItUpdate(updates: PostItUpdate): void {
-  if (updates.position) {
-    if (
-      typeof updates.position.x !== 'number' ||
-      typeof updates.position.y !== 'number'
-    ) {
-      throw new Error("Both 'x' and 'y' must be provided for position updates");
-    }
-  }
 
-  if (updates.size) {
-    if (
-      typeof updates.size.width !== 'number' ||
-      typeof updates.size.height !== 'number'
-    ) {
-      throw new Error("Both 'width' and 'height' must be provided for size updates");
-    }
-  }
+type PostItUpdate = {
+  content?: string;
+  position?: { x: number; y: number };
+  size?: { width: number; height: number };
+};
 
-  // Additional validations can be added here
-}
+const DEBOUNCE_WAIT = 500; // Debounce delay in milliseconds
 
-
-export async function updatePostItAttributes(
-  postItId: string,
-  userId: string,
-  updates: PostItUpdate
-): Promise<void> {
-  // Validate the updates
-  validatePostItUpdate(updates);
-  const postItRef = firebaseAdmin.firestore().collection("PostIts ").doc(postItId);
-  const postItDoc = await postItRef.get();
-  if(!postItDoc) {
-    throw new Error("PostIt data not found");
-  }
-
-
-  // Check authorization
-  const isAuthorized = await isUserAuthorized(userId, postItDoc);
-  if (!isAuthorized) throw new Error("Unauthorized");
-
-  // Perform the update
-  await postItRef.update( updates );
-}
+// Firestore update function with debouncing
+const performUpdate = async (postItId: string, updates: PostItUpdate) => {
+  const postItRef = db.collection('PostIts').doc(postItId);
+  await postItRef.update(updates);
+};
