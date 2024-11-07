@@ -1,4 +1,5 @@
 import { db, firebaseAdmin } from "../configs/firebaseConfig";//-
+import { PostItUpdate } from "../types/customTypes";
 
 
 export const getPostItIfExists = async (postItId: string): Promise<FirebaseFirestore.DocumentSnapshot | null> => {
@@ -64,16 +65,27 @@ async function isUserAuthorized( userId: string, postItDoc: FirebaseFirestore.Do
 }
 
 
-type PostItUpdate = {
-  content?: string;
-  position?: { x: number; y: number };
-  size?: { width: number; height: number };
-};
+
 
 const DEBOUNCE_WAIT = 500; // Debounce delay in milliseconds
 
 // Firestore update function with debouncing
-const performUpdate = async (postItId: string, updates: PostItUpdate) => {
-  const postItRef = db.collection('PostIts').doc(postItId);
+export async function updatePostItInFirestore(postItId: string, updates: PostItUpdate, userId: string): Promise<void> {
+  const postItRef = firebaseAdmin.firestore().collection('PostIts').doc(postItId);
+  const postItDoc = await postItRef.get();
+
+  if (!postItDoc.exists) {
+    throw new Error('PostIt does not exist');
+  }
+
+  const postItData = postItDoc.data();
+
+  // Authorization check: Only allow update if user is authorized
+  let isAllowed = await isUserAuthorized(userId, postItDoc);
+  if (!isAllowed) {
+    throw new Error('Unauthorized update attempt');
+  }
+
+  // Perform the update
   await postItRef.update(updates);
-};
+}

@@ -31,3 +31,9 @@ export type PostItUpdateData = {
   size?: { width: number; height: number };
   userId: string;
 };
+
+export type PostItUpdate = {
+  content?: string;
+  position?: { x: number; y: number };
+  size?: { width: number; height: number };
+};
