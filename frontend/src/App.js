@@ -8,6 +8,7 @@ import { getBackendUrl, loadServerSettings } from "./configs/serverSettings";
 import { useEffect, useState } from "react";
 import TestPage from "./components/testPage";
 import EditAccountPage from "./components/editAccountPage";
+import ForgotPassword from "./components/forgotPassword";
 
 function App() {
   const [backendUrl, setBackendUrl] = useState("");
@@ -31,6 +32,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/workspace" element={<Workboard />} />
           <Route path="/edit-account" element={<EditAccountPage />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/test" element={<TestPage />} />{" "}
           {/* Add TestPage route */}
           {/* Add other routes here */}
