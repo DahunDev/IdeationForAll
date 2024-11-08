@@ -21,7 +21,7 @@ const Workboard = () => {
   }, [navigate]);
 
   const accountPageNav = () => {
-    navigate("/workspace"); // TO DO: Change Navigate link to edit account page once fully functional
+    navigate("/edit-account"); // TO DO: Change Navigate link to edit account page once fully functional
   };
 
   const addNote = () => {
