@@ -1,7 +1,82 @@
-#login-fail-message{
-    color: red;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-#login-fail{
+body, html {
+    height: 100%;
+    margin: 0;
+}
+
+.login-body {
+    font-family: Arial, sans-serif;
+    background-color: #F0E68C; /* Yellow background covering the entire page */
+    height: 100vh; /* Full viewport height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-container {
+    background-color: #E4A662;
+    padding: 30px;
+    border: 3px solid #8B4513;
+    border-radius: 10px;
+    width: 400px;
+    text-align: center;
+}
+
+.login-header {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.login-input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #8B4513;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.login-button {
+    padding: 10px 20px;
+    background-color: yellow;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.login-button:hover {
+    background-color: #FFD700;
+}
+
+.goto-links {
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.goto-link-item {
+    color: #333;
+    text-decoration: none;
+    margin-right: 15px;
+}
+
+.goto-link-item:hover {
+    text-decoration: underline;
+}
+
+#login-fail {
     display: none;
+    margin-top: 15px;
+}
+
+#login-fail-message {
+    color: red;
 }
