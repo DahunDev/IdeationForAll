@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import './RegisterPage.css';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const RegisterPage = () => {
     const [email, setEmail] = useState('');
@@ -10,9 +10,10 @@ const RegisterPage = () => {
     const [repassword, setRepassword] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const navigate = useNavigate();
 
     const handleRegister = async (event) => {
-        event.preventDefault(); // Prevent the default form submission
+        event.preventDefault();
 
         // Reset messages
         setError('');
@@ -34,60 +35,60 @@ const RegisterPage = () => {
             // Handle successful registration
             if (response.status === 201) {
                 setSuccess('Registration successful! Please log in.');
-                // Navigate("/login");
+                setTimeout(() => navigate("/login"), 2000);
             }
         } catch (err) {
-            // Handle error response
             setError(err.response?.data?.message || 'Registration failed. Please try again.');
         }
     };
 
     return (
-        <div className="container">
-            <h1>Ideation For All</h1>
-            <form onSubmit={handleRegister}>
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                />
-                <input
-                    type="text"
-                    name="username"
-                    placeholder="Username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    required
-                />
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-                <input
-                    type="password"
-                    name="repassword"
-                    placeholder="Re-type Password"
-                    value={repassword}
-                    onChange={(e) => setRepassword(e.target.value)}
-                    required
-                />
-                <button type="submit">Create Account</button>
-            </form>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+        <div className="register-body">
+            <div className="register-container">
+                <h2 className="register-header">Register - Ideation For All</h2>
+                <form onSubmit={handleRegister}>
+                    <input
+                        type="email"
+                        className="register-input"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+                    <input
+                        type="text"
+                        className="register-input"
+                        placeholder="Username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        required
+                    />
+                    <input
+                        type="password"
+                        className="register-input"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                    />
+                    <input
+                        type="password"
+                        className="register-input"
+                        placeholder="Re-type Password"
+                        value={repassword}
+                        onChange={(e) => setRepassword(e.target.value)}
+                        required
+                    />
+                    <button type="submit" className="register-button">Create Account</button>
+                </form>
 
-            {/* Update the success message to include the link to the login page */}
-            {success && (
-                <p style={{ color: 'green' }}>
-                    {success} <Link to="/login">Log in</Link>.
-                </p>
-            )}
+                {error && <p className="error-message">{error}</p>}
+                {success && (
+                    <p className="success-message">
+                        {success} <Link to="/login">Log in</Link>.
+                    </p>
+                )}
+            </div>
         </div>
     );
 };
