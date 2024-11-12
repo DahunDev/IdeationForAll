@@ -35,4 +35,6 @@ export type PostItUpdate = {
   content?: string;
   position?: { x: number; y: number };
   size?: { width: number; height: number };
+  name?: string;
+  font?: string;
 };

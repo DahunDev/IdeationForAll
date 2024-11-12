@@ -3,19 +3,34 @@ import { useNavigate } from "react-router-dom";
 import "./workboard.css";
 import PostIt from "./functions/PostIts";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../configs/firebaseConfig";
+import { auth, db } from "../configs/firebaseConfig";
+import { doc, getDoc } from "firebase/firestore";
 
 const Workboard = () => {
   const [postits, setPostits] = useState([]);
+  const [username, setUsername] = useState();
   const navigate = useNavigate();
 
   useEffect(() => {
     // Check if user is logged in
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, async (user) => {
       if (!user) {
         navigate("/login"); // Redirect to login if not logged in
       } else {
         console.log(user);
+        try {
+          const userDoc = doc(db, "Users", user.uid); // Reference to the user document
+          const userSnapshot = await getDoc(userDoc); // Fetch the document
+
+          if (userSnapshot.exists()) {
+            const userData = userSnapshot.data();
+            setUsername(userData.username); // Set the username state
+          } else {
+            console.log("No such document!");
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
       }
     });
   }, [navigate]);
@@ -45,7 +60,7 @@ const Workboard = () => {
             <input class="titletext" placeholder="Title:"></input>
             <h1 class="name_header">Ideation for All</h1>
             <button class="account_button" onClick={accountPageNav}>
-              TestAccount123
+              {username || "Account"}
             </button>
           </div>
           <div class="options_container">
