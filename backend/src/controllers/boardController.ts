@@ -3,9 +3,6 @@ import { Request, Response } from "express";
 import { AuthenticatedRequest } from "../types/customTypes";
 import { db, firebaseAdmin } from "../configs/firebaseConfig"; // Assume db is your Firestore instance
 
-
-
-
 export const createBoard = async (
   req: AuthenticatedRequest,
   res: Response,
@@ -159,8 +156,6 @@ export const getBoard = async (
   }
 };
 
-
-
 export const createGroup = async (
   req: AuthenticatedRequest,
   res: Response,
@@ -211,15 +206,15 @@ export const createGroup = async (
     const newGroupRef = boardRef.collection("Groups").doc();
     const groupId = newGroupRef.id;
 
-  // Create the new group document
-  await newGroupRef.set({
-    groupId,
-    title: groupName,
-    postIts: [], // Initialize with an empty array
-    upvotedUsers: [],
-    downvotedUsers: [],
-    upvotes: 0
-  });
+    // Create the new group document
+    await newGroupRef.set({
+      groupId,
+      title: groupName,
+      postIts: [], // Initialize with an empty array
+      upvotedUsers: [],
+      downvotedUsers: [],
+      upvotes: 0,
+    });
 
     res.status(201).json({ message: "Group created successfully", groupId });
     return;
@@ -253,7 +248,10 @@ export const deleteGroup = async (
   }
 
   try {
-    const boardRef = firebaseAdmin.firestore().collection("Boards").doc(boardId);
+    const boardRef = firebaseAdmin
+      .firestore()
+      .collection("Boards")
+      .doc(boardId);
     const boardDoc = await boardRef.get();
 
     if (!boardDoc.exists) {
@@ -289,14 +287,17 @@ export const deleteGroup = async (
     }
 
     const groupData = groupDoc.data();
-    const postItRefs: firebaseAdmin.firestore.DocumentReference[] = groupData?.postIts || []; // Define postItRefs as an array of DocumentReference
+    const postItRefs: firebaseAdmin.firestore.DocumentReference[] =
+      groupData?.postIts || []; // Define postItRefs as an array of DocumentReference
 
     // Step 2: Move all associated post-its to ungrouped
-    postItRefs.forEach((postItRef: firebaseAdmin.firestore.DocumentReference) => {
-      batch.update(postItRef, {
-        groupId: firebaseAdmin.firestore.FieldValue.delete(), // Remove the groupId to ungroup
-      });
-    });
+    postItRefs.forEach(
+      (postItRef: firebaseAdmin.firestore.DocumentReference) => {
+        batch.update(postItRef, {
+          groupId: firebaseAdmin.firestore.FieldValue.delete(), // Remove the groupId to ungroup
+        });
+      },
+    );
 
     // Step 3: Delete the group
     batch.delete(groupRef);

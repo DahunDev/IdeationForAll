@@ -13,7 +13,6 @@ export interface AuthenticatedRequest extends Request {
   headers: IncomingHttpHeaders; // Use IncomingHttpHeaders instead of a custom object
 }
 
-
 export interface Position {
   x: number;
   y: number;

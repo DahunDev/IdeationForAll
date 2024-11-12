@@ -2,7 +2,12 @@
 import { Router } from "express";
 
 import { authenticateUser } from "../middleware/authMiddleware";
-import { createBoard, createGroup, deleteGroup, getBoard } from "../controllers/boardController";
+import {
+  createBoard,
+  createGroup,
+  deleteGroup,
+  getBoard,
+} from "../controllers/boardController";
 
 const router = Router();
 

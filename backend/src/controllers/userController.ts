@@ -107,7 +107,7 @@ export const updateEmail = async (
 
     // Retrieve old user data before updating
     const oldUserData = await authAdmin.getUser(userId);
-    console.log("oldUserData: " , oldUserData);
+    console.log("oldUserData: ", oldUserData);
 
     // Attempt to update the email in Firebase Authentication
     try {
@@ -125,22 +125,23 @@ export const updateEmail = async (
 
     // Now attempt to update the email in Firestore
     try {
-
-
       const userRef = firebaseAdmin.firestore().collection("Users").doc(userId);
       const userDoc = await userRef.get();
-  
+
       if (!userDoc.exists) {
         // Create new document with the email if it doesn’t exist
         await userRef.set({ email: newEmail });
         //actually this code shouldn;t run unless account create by firebase authentication console
         console.warn(`As user docs missing for userID:${userId}, created it`);
-      } 
+      }
 
       await userRef.update({ email: newEmail });
-        res
+      res
         .status(200)
-        .json({ message: "Email updated successfully. Due to secruity policy, need to sign in again!" });
+        .json({
+          message:
+            "Email updated successfully. Due to secruity policy, need to sign in again!",
+        });
       return;
     } catch (firestoreError) {
       // If Firestore update fails, revert the email in Firebase Authentication
@@ -170,10 +171,6 @@ export const updateEmail = async (
   }
 };
 
-
-
-
-
 export const updateUsername = async (
   req: AuthenticatedRequest,
   res: Response,
@@ -195,21 +192,18 @@ export const updateUsername = async (
   try {
     // Check if the new email is already in use
     const userRef = firebaseAdmin.firestore().collection("Users").doc(userId);
-      const userDoc = await userRef.get();
-  
-      if (!userDoc.exists) {
-        // Create new document with the email if it doesn’t exist
-        await userRef.set({ email: req.user?.email, username: username});
-        //actually this code shouldn;t run unless account create by firebase authentication console
-        console.warn(`As user docs missing for userID:${userId}, created it`);
-      } 
+    const userDoc = await userRef.get();
 
-      await userRef.update({ username: username });
-        res
-        .status(200)
-        .json({ message: "Successfully updated username." });
-      return;
+    if (!userDoc.exists) {
+      // Create new document with the email if it doesn’t exist
+      await userRef.set({ email: req.user?.email, username: username });
+      //actually this code shouldn;t run unless account create by firebase authentication console
+      console.warn(`As user docs missing for userID:${userId}, created it`);
+    }
 
+    await userRef.update({ username: username });
+    res.status(200).json({ message: "Successfully updated username." });
+    return;
   } catch (error) {
     console.error("Unexpected error:", error);
     res.status(500).json({ message: "Failed to update email" });

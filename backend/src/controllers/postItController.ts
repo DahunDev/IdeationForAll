@@ -65,7 +65,6 @@ export const createPostIt = async (
       associatedGroups: [], // No group assignment, so leave this empty
       position: position || { x: 0, y: 0 }, // Default position (if not provided)
       size: size || { width: 100, height: 250 }, // Default size
-
     };
 
     // Add the Post-It creation to the batch
@@ -262,7 +261,6 @@ export const updatePostItGroup = async (
   }
 };
 
-
 export const updatePostItFont = async (
   req: AuthenticatedRequest,
   res: Response,
@@ -321,7 +319,9 @@ export const updatePostItFont = async (
     if (userId !== postItOwnerId && userId !== boardOwnerId) {
       res
         .status(403)
-        .json({ message: "You do not have permission to edit font for this PostIt" });
+        .json({
+          message: "You do not have permission to edit font for this PostIt",
+        });
       return;
     }
     await postItRef.update({ font: font });

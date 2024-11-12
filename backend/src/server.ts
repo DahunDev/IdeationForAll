@@ -32,14 +32,14 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: "*", // Replace with your frontend's URL in production for security
-    methods: ["GET", "POST", "PATCH", "PUT"]
-  }
+    methods: ["GET", "POST", "PATCH", "PUT"],
+  },
 });
 
 // Handle WebSocket connections
 io.on("connection", (socket) => {
   console.log(`Client connected: ${socket.id}`);
-  
+
   // Use the WebSocket handler for post-it events
   handlePostItWs(socket);
 

@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import TestPage from "./components/testPage";
 import EditAccountPage from "./components/editAccountPage";
 import ForgotPassword from "./components/forgotPassword";
+import HomeRedirect from "./components/HomeRedirect";
 
 function App() {
   const [backendUrl, setBackendUrl] = useState("");
@@ -28,6 +29,7 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
+          <Route path="/" element={<HomeRedirect />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/workspace" element={<Workboard />} />
