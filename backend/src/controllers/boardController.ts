@@ -311,3 +311,68 @@ export const deleteGroup = async (
     res.status(500).json({ message: "Failed to delete group" });
   }
 };
+
+
+/* @returns {Promise<Array<{boardId: string, name: string}>>} - List of boards with `boardId` and `name`.*/
+
+export const getBoardList = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
+  const userId = req.user?.uid; // Retrieve the UID from the authenticated request
+
+  if (!userId) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+  try {
+    // Retrieve the user document
+    const userRef = db.collection("Users").doc(userId);
+    const userDoc = await userRef.get();
+
+    if (!userDoc.exists) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    const userData = userDoc.data();
+    if (!userData) {
+      res.status(404).json({ message: "User data is undefined" });
+      return;
+    }
+
+    // Combine references from OwnedBoards and SharedBoards
+    const boardRefs: FirebaseFirestore.DocumentReference[] = [
+      ...(userData.OwnedBoards || []),
+      ...(userData.SharedBoards || []),
+    ];
+
+    if (boardRefs.length === 0) {
+      res.status(200).json({ boards: [] }); // No boards accessible to the user
+      return;
+    }
+
+    // Fetch board details in parallel
+    const boardDetails = await Promise.all(
+      boardRefs.map(async (boardRef) => {
+        const boardDoc = await boardRef.get();
+        if (boardDoc.exists) {
+          const boardData = boardDoc.data();
+          return { boardId: boardDoc.id, name: boardData?.name };
+        }
+        return null; // Handle missing board references
+      })
+    );
+
+    // Filter out any null results
+    const filteredBoards = boardDetails.filter((board) => board !== null);
+
+    res.status(200).json({ boards: filteredBoards });
+    return;
+  } catch (error) {
+    console.error("Error fetching boards for user:", error);
+    res.status(500).json({ message: "Failed to fetch boards" });
+    return;
+  }
+  
+};

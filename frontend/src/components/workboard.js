@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "./workboard.css";
 import PostIt from "./functions/PostIts";
 import { onAuthStateChanged } from "firebase/auth";
@@ -9,7 +9,10 @@ import { doc, getDoc } from "firebase/firestore";
 const Workboard = () => {
   const [postits, setPostits] = useState([]);
   const [username, setUsername] = useState();
+  const [userToken, setUserToken] = useState();
+  const [boardTitle, setBoardTitle] = useState();
   const navigate = useNavigate();
+  const { boardId } = useParams();
 
   useEffect(() => {
     // Check if user is logged in
@@ -19,12 +22,16 @@ const Workboard = () => {
       } else {
         console.log(user);
         try {
+          
           const userDoc = doc(db, "Users", user.uid); // Reference to the user document
           const userSnapshot = await getDoc(userDoc); // Fetch the document
 
           if (userSnapshot.exists()) {
             const userData = userSnapshot.data();
             setUsername(userData.username); // Set the username state
+            const token = await user.getIdToken();
+            setUserToken(token);
+
           } else {
             console.log("No such document!");
           }
@@ -35,21 +42,110 @@ const Workboard = () => {
     });
   }, [navigate]);
 
+  // Fetch board data
+  useEffect(() => {
+    if (userToken && boardId) {
+      fetchBoardData(boardId);
+    }
+  }, [userToken, boardId]);
+
+  const fetchBoardData = async (boardId) => {
+    try {
+      const response = await fetch("/api/board/getBoard", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userToken}`,
+        },
+        body: JSON.stringify({ boardId }),
+      });
+
+      if (response.ok) {
+        const boardData = await response.json();
+        setBoardTitle(boardData.title || "Untitled Board");
+        setPostits(boardData.postIts || []);
+      } else {
+        console.error("Failed to fetch board data:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error fetching board data:", error);
+    }
+  };
+
+  const createNewBoard = async (groupName) => {
+    try {
+      const response = await fetch("/api/board/createGroup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userToken}`,
+        },
+        body: JSON.stringify({ boardId: boardId || Date.now(), groupName }),
+      });
+
+      if (response.ok) {
+        const newBoard = await response.json();
+        setBoardTitle(newBoard.groupName);
+        setPostits([]);
+      } else {
+        console.error("Failed to create new board:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error creating new board:", error);
+    }
+  };
+
   const accountPageNav = () => {
     navigate("/edit-account"); // TO DO: Change Navigate link to edit account page once fully functional
   };
 
-  const addNote = () => {
-    setPostits([
-      ...postits,
-      {
-        id: Date.now(),
-      },
-    ]);
+  const addNote = async () => {
+    try {
+      const response = await fetch("/api/postit/createPostIt", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userToken}`,
+        },
+        body: JSON.stringify({ name: "New Post-It", boardId }),
+      });
+
+      if (response.ok) {
+        const newPostIt = await response.json();
+        setPostits((prevPostits) => [
+          ...prevPostits,
+          { id: newPostIt.postItId, name: "New Post-It" },
+        ]);
+      } else {
+        console.error("Failed to create post-it:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error creating post-it:", error);
+    }
   };
 
-  const deletePostit = (postitId) => {
-    setPostits(postits.filter((item) => item.id !== postitId));
+
+  const deletePostit = async (postitId) => {
+    try {
+      // Make API call to delete the post-it
+      const response = await fetch("/api/postit/deletePostIt", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userToken}`, // Assuming userToken is stored in state or context
+        },
+        body: JSON.stringify({ postItId }),
+      });
+  
+      if (response.ok) {
+        // If the API call was successful, update the state
+        setPostits((prevPostits) => prevPostits.filter((item) => item.id !== postitId));
+      } else {
+        console.error("Failed to delete post-it:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error deleting post-it:", error);
+    }
   };
 
   return (
@@ -57,8 +153,14 @@ const Workboard = () => {
       <body class="board_body">
         <div class="toolbar_container">
           <div class="head_container">
-            <input class="titletext" placeholder="Title:"></input>
-            <h1 class="name_header">Ideation for All</h1>
+          <input
+            className="titletext"
+            value={boardTitle}
+            onChange={(e) => setBoardTitle(e.target.value)}
+            placeholder="Title:"
+          />
+          
+          <h1 class="name_header">Ideation for All</h1>
             <button class="account_button" onClick={accountPageNav}>
               {username || "Account"}
             </button>
