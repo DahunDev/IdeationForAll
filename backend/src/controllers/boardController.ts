@@ -70,7 +70,7 @@ export const getBoard = async (
   res: Response,
 ): Promise<void> => {
   const userId = req.user?.uid; // Retrieve the UID from the authenticated request
-  const { boardId } = req.body; // Extract boardName from the request body
+  const boardId = req.query.boardId as string; // Extract boardId from query parameters
 
   if (!userId) {
     res.status(401).json({ message: "Unauthorized" });
@@ -312,7 +312,6 @@ export const deleteGroup = async (
   }
 };
 
-
 /* @returns {Promise<Array<{boardId: string, name: string}>>} - List of boards with `boardId` and `name`.*/
 
 export const getBoardList = async (
@@ -361,7 +360,7 @@ export const getBoardList = async (
           return { boardId: boardDoc.id, name: boardData?.name };
         }
         return null; // Handle missing board references
-      })
+      }),
     );
 
     // Filter out any null results
@@ -374,5 +373,4 @@ export const getBoardList = async (
     res.status(500).json({ message: "Failed to fetch boards" });
     return;
   }
-  
 };

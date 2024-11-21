@@ -5,12 +5,15 @@ import PostIt from "./functions/PostIts";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "../configs/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
+import { getBackendUrl } from "../configs/serverSettings";
 
 const Workboard = () => {
   const [postits, setPostits] = useState([]);
   const [username, setUsername] = useState();
   const [userToken, setUserToken] = useState();
   const [boardTitle, setBoardTitle] = useState();
+  const [ungroupedPostIts, setUngroupedPostIts] = useState([]);
+
   const navigate = useNavigate();
   const { boardId } = useParams();
 
@@ -51,19 +54,22 @@ const Workboard = () => {
 
   const fetchBoardData = async (boardId) => {
     try {
-      const response = await fetch("/api/board/getBoard", {
+      const backendUrl = getBackendUrl();
+
+      const response = await fetch(`${backendUrl}/api/board/getBoard?boardId=${encodeURIComponent(boardId)}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${userToken}`,
         },
-        body: JSON.stringify({ boardId }),
       });
 
       if (response.ok) {
         const boardData = await response.json();
-        setBoardTitle(boardData.title || "Untitled Board");
-        setPostits(boardData.postIts || []);
+        console.log(boardData);
+        setBoardTitle(boardData.name || "Untitled Board");
+        setPostits(boardData.UngroupedPostIts || []);
+        setUngroupedPostIts(boardData.UngroupedPostIts || []);
       } else {
         console.error("Failed to fetch board data:", response.statusText);
       }
@@ -74,7 +80,7 @@ const Workboard = () => {
 
   const createNewBoard = async (groupName) => {
     try {
-      const response = await fetch("/api/board/createGroup", {
+      const response = await fetch(`${getBackendUrl()}/api/board/createGroup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -101,7 +107,7 @@ const Workboard = () => {
 
   const addNote = async () => {
     try {
-      const response = await fetch("/api/postit/createPostIt", {
+      const response = await fetch(`${getBackendUrl()}/api/postit/createPostIt`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -128,13 +134,13 @@ const Workboard = () => {
   const deletePostit = async (postitId) => {
     try {
       // Make API call to delete the post-it
-      const response = await fetch("/api/postit/deletePostIt", {
+      const response = await fetch(`${getBackendUrl()}/api/postit/deletePostIt`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${userToken}`, // Assuming userToken is stored in state or context
         },
-        body: JSON.stringify({ postItId }),
+        body: JSON.stringify({ postitId }),
       });
   
       if (response.ok) {
@@ -149,10 +155,9 @@ const Workboard = () => {
   };
 
   return (
-    <html lang="en">
-      <body class="board_body">
-        <div class="toolbar_container">
-          <div class="head_container">
+      <body className="board_body">
+        <div className="toolbar_container">
+          <div className="head_container">
           <input
             className="titletext"
             value={boardTitle}
@@ -160,29 +165,36 @@ const Workboard = () => {
             placeholder="Title:"
           />
           
-          <h1 class="name_header">Ideation for All</h1>
-            <button class="account_button" onClick={accountPageNav}>
+          <h1 className="name_header">Ideation for All</h1>
+            <button className="account_button" onClick={accountPageNav}>
               {username || "Account"}
             </button>
           </div>
-          <div class="options_container">
-            <button class="save_or_share_button">Save...</button>
-            <button class="save_or_share_button">Share</button>
+          <div className="options_container">
+            <button className="save_or_share_button">Save...</button>
+            <button className="save_or_share_button">Share</button>
           </div>
-          <div class="workspace_container">
-            <button class="workspace_button" onClick={addNote}>
+          <div className="workspace_container">
+            <button className="workspace_button" onClick={addNote}>
               Create new post-it
             </button>
-            <button class="workspace_button">Create vote</button>
-            <button class="workspace_button">Groups</button>
-            <button class="workspace_button">People: 1</button>
+            <button className="workspace_button">Create vote</button>
+            <button className="workspace_button">Groups</button>
+            <button className="workspace_button">People: 1</button>
           </div>
           {postits.map((item) => (
-            <PostIt key={item.id} onClose={() => deletePostit(item.id)} />
+            <PostIt
+              key={item.postItId}
+              id={item.postItId}
+              name={item.name}
+              content={item.content}
+              position={item.position}
+              votes={item.votes}
+              onClose={() => deletePostit(item.id)} 
+            />
           ))}
         </div>
       </body>
-    </html>
   );
 };
 export default Workboard;

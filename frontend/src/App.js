@@ -33,6 +33,7 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/workspace" element={<Workboard />} />
+          <Route path="/workspace/:boardId" element={<Workboard />} />
           <Route path="/edit-account" element={<EditAccountPage />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/test" element={<TestPage />} />{" "}

@@ -455,13 +455,14 @@ export const copyPostIt = async (
       postIt: postItData,
     });
   } catch (error: any) {
-    if(error as Error){
-    // console.error("Error creating Post-It:", error);
-    res.status(500).json({ message: "Failed to copy Post-It" , error: error.message});
-    }else{
-    // console.error("Error creating Post-It:", error);
-    res.status(500).json({ message: "Failed to copy Post-It",error});
+    if (error as Error) {
+      // console.error("Error creating Post-It:", error);
+      res
+        .status(500)
+        .json({ message: "Failed to copy Post-It", error: error.message });
+    } else {
+      // console.error("Error creating Post-It:", error);
+      res.status(500).json({ message: "Failed to copy Post-It", error });
     }
-
   }
 };
