@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 
-export default function PostIt({ onClose }) {
+export default function PostIt({ id, name, onClose }) {
   const [move, setMove] = useState(false);
   const postitRef = useRef();
 
@@ -34,8 +34,9 @@ export default function PostIt({ onClose }) {
         onMouseUp={mouseUp}
         onMouseMove={mouseMove}
       >
-        <div>Sticky Note</div>
-        <div className="close" onClick={onClose}>
+        <div>{name || "Sticky Note"}</div>
+
+        <div className="close" onClick={onClose(id)}>
           &times;
         </div>
       </div>
