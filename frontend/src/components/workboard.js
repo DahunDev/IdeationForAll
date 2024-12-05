@@ -25,7 +25,6 @@ const Workboard = () => {
       } else {
         console.log(user);
         try {
-          
           const userDoc = doc(db, "Users", user.uid); // Reference to the user document
           const userSnapshot = await getDoc(userDoc); // Fetch the document
 
@@ -34,7 +33,6 @@ const Workboard = () => {
             setUsername(userData.username); // Set the username state
             const token = await user.getIdToken();
             setUserToken(token);
-
           } else {
             console.log("No such document!");
           }
@@ -56,13 +54,16 @@ const Workboard = () => {
     try {
       const backendUrl = getBackendUrl();
 
-      const response = await fetch(`${backendUrl}/api/board/getBoard?boardId=${encodeURIComponent(boardId)}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userToken}`,
+      const response = await fetch(
+        `${backendUrl}/api/board/getBoard?boardId=${encodeURIComponent(boardId)}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userToken}`,
+          },
         },
-      });
+      );
 
       if (response.ok) {
         const boardData = await response.json();
@@ -107,14 +108,17 @@ const Workboard = () => {
 
   const addNote = async () => {
     try {
-      const response = await fetch(`${getBackendUrl()}/api/postit/createPostIt`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userToken}`,
+      const response = await fetch(
+        `${getBackendUrl()}/api/postit/createPostIt`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userToken}`,
+          },
+          body: JSON.stringify({ name: "New Post-It", boardId }),
         },
-        body: JSON.stringify({ name: "New Post-It", boardId }),
-      });
+      );
 
       if (response.ok) {
         const newPostIt = await response.json();
@@ -130,22 +134,31 @@ const Workboard = () => {
     }
   };
 
-
-  const deletePostit = async (postitId) => {
+  const deletePostit = async (postItId) => {
     try {
       // Make API call to delete the post-it
-      const response = await fetch(`${getBackendUrl()}/api/postit/deletePostIt`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userToken}`, // Assuming userToken is stored in state or context
+      const response = await fetch(
+        `${getBackendUrl()}/api/postit/deletePostIt`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userToken}`, // Assuming userToken is stored in state or context
+          },
+          body: JSON.stringify({ postItId }),
         },
-        body: JSON.stringify({ postitId }),
-      });
-  
+      );
+      console.log("Deleting PostIt with ID:", postItId, `Bearer ${userToken}`); // Log the ID being sent
+
       if (response.ok) {
         // If the API call was successful, update the state
-        setPostits((prevPostits) => prevPostits.filter((item) => item.id !== postitId));
+        setPostits((prevPostits) => {
+          const updatedPostIts = prevPostits.filter(
+            (item) => item.postItId !== postItId,
+          );
+          // console.log("After update", updatedPostIts);
+          return updatedPostIts;
+        });
       } else {
         console.error("Failed to delete post-it:", response.statusText);
       }
@@ -155,49 +168,48 @@ const Workboard = () => {
   };
 
   return (
-      <body className="board_body">
-        <div className="toolbar_container">
-          <div className="head_container">
+    <body className="board_body">
+      <div className="toolbar_container">
+        <div className="head_container">
           <input
             className="titletext"
             value={boardTitle}
             onChange={(e) => setBoardTitle(e.target.value)}
             placeholder="Title:"
           />
-          
+
           <h1 className="name_header">Ideation for All</h1>
-            <button className="account_button" onClick={accountPageNav}>
-              {username || "Account"}
-            </button>
-          </div>
-          <div className="options_container">
-            <button className="save_or_share_button">Save...</button>
-            <button className="save_or_share_button">Share</button>
-          </div>
-          <div className="workspace_container">
-            <button className="workspace_button" onClick={addNote}>
-              Create new post-it
-            </button>
-            <button className="workspace_button">Create vote</button>
-            <button className="workspace_button">Groups</button>
-            <button className="workspace_button">People: 1</button>
-          </div>
-          {postits.map((item) => (
-            
-            <PostIt
-              key={item.postItId}
-              id={item.postItId}
-              name={item.name}
-              content={item.content}
-              position={item.position}
-              votes={item.votes || 0}
-              font={item.font}
-              size={item.size}
-              onClose={() => deletePostit(item.postItId)} // Call delete function on delete
-            />
-          ))}
+          <button className="account_button" onClick={accountPageNav}>
+            {username || "Account"}
+          </button>
         </div>
-      </body>
+        <div className="options_container">
+          <button className="save_or_share_button">Save...</button>
+          <button className="save_or_share_button">Share</button>
+        </div>
+        <div className="workspace_container">
+          <button className="workspace_button" onClick={addNote}>
+            Create new post-it
+          </button>
+          <button className="workspace_button">Create vote</button>
+          <button className="workspace_button">Groups</button>
+          <button className="workspace_button">People: 1</button>
+        </div>
+        {postits.map((item) => (
+          <PostIt
+            key={item.postItId}
+            id={item.postItId}
+            name={item.name}
+            content={item.content}
+            position={item.position}
+            votes={item.votes || 0}
+            font={item.font}
+            size={item.size}
+            onClose={() => deletePostit(item.postItId)} // Call delete function on delete
+          />
+        ))}
+      </div>
+    </body>
   );
 };
 export default Workboard;

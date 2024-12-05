@@ -36,7 +36,7 @@ export default function PostIt({ id, name, onClose }) {
       >
         <div>{name || "Sticky Note"}</div>
 
-        <div className="close" onClick={onClose(id)}>
+        <div className="close" onClick={onClose}>
           &times;
         </div>
       </div>
