@@ -183,14 +183,17 @@ const Workboard = () => {
             <button className="workspace_button">People: 1</button>
           </div>
           {postits.map((item) => (
+            
             <PostIt
               key={item.postItId}
               id={item.postItId}
               name={item.name}
               content={item.content}
               position={item.position}
-              votes={item.votes}
-              onClose={() => deletePostit(item.id)} 
+              votes={item.votes || 0}
+              font={item.font}
+              size={item.size}
+              onClose={() => deletePostit(item.postItId)} // Call delete function on delete
             />
           ))}
         </div>
