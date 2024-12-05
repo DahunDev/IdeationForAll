@@ -12,3 +12,29 @@ export interface AuthenticatedRequest extends Request {
   user?: UserPayload;
   headers: IncomingHttpHeaders; // Use IncomingHttpHeaders instead of a custom object
 }
+
+export interface Position {
+  x: number;
+  y: number;
+}
+
+export interface Size {
+  width: number;
+  height: number;
+}
+
+export type PostItUpdateData = {
+  postItId: string;
+  content?: string;
+  position?: { x: number; y: number };
+  size?: { width: number; height: number };
+  userId: string;
+};
+
+export type PostItUpdate = {
+  content?: string;
+  position?: { x: number; y: number };
+  size?: { width: number; height: number };
+  name?: string;
+  font?: string;
+};

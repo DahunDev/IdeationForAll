@@ -7,7 +7,7 @@ export const createPostIt = async (
   res: Response,
 ): Promise<void> => {
   const userId = req.user?.uid; // Retrieve the UID from the authenticated request
-  const { name, boardId, content, position } = req.body; // Extract boardName from the request body
+  const { name, boardId, content, position, size } = req.body; // Extract boardName from the request body
 
   if (!userId) {
     res.status(401).json({ message: "Unauthorized" });
@@ -59,11 +59,12 @@ export const createPostIt = async (
       postItId,
       associatedBoardID: boardId,
       name,
+      font: "",
       posterUserID: userId,
       content: content || "", // If content is provided, use it, otherwise set it to an empty string
-      votes: 0, // Start with 0 votes
       associatedGroups: [], // No group assignment, so leave this empty
       position: position || { x: 0, y: 0 }, // Default position (if not provided)
+      size: size || { width: 100, height: 250 }, // Default size
     };
 
     // Add the Post-It creation to the batch
@@ -257,5 +258,211 @@ export const updatePostItGroup = async (
   } catch (error) {
     console.error("Error moving PostIt:", error);
     res.status(500).json({ message: "Failed to move PostIt" });
+  }
+};
+
+export const updatePostItFont = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
+  const userId = req.user?.uid;
+  const { postItId, font } = req.body; // targetGroupId is null if moving to ungrouped
+
+  if (!userId) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
+  if (!postItId) {
+    res.status(400).json({ message: "postItId is required" });
+    return;
+  }
+
+  try {
+    const postItRef = db.collection("PostIts").doc(postItId);
+    const postItDoc = await postItRef.get();
+
+    if (!postItDoc.exists) {
+      res.status(404).json({ message: "PostIt not found" });
+      return;
+    }
+
+    if (!postItDoc || !postItDoc.exists) {
+      res.status(404).json({ message: "PostIt not found" });
+      return;
+    }
+
+    const postItData = postItDoc.data();
+    const boardId = postItData?.associatedBoardID;
+
+    if (!boardId) {
+      res
+        .status(500)
+        .json({ message: "Associated board ID is missing in PostIt data" });
+      return;
+    }
+
+    // Retrieve the associated board document to check for board ownership
+    const boardRef = db.collection("Boards").doc(boardId);
+    const boardDoc = await boardRef.get();
+
+    if (!boardDoc.exists) {
+      res.status(404).json({ message: "Associated board not found" });
+      return;
+    }
+
+    const boardData = boardDoc.data();
+    const boardOwnerId = boardData?.workspaceOrganizerId;
+    const postItOwnerId = postItData?.posterUserID;
+
+    // Check if the current user is either the PostIt owner or the board owner
+    if (userId !== postItOwnerId && userId !== boardOwnerId) {
+      res.status(403).json({
+        message: "You do not have permission to edit font for this PostIt",
+      });
+      return;
+    }
+    await postItRef.update({ font: font });
+    res.status(200).json({ message: "PostIt font updated successfully" });
+  } catch (error) {
+    console.error("Error moving PostIt:", error);
+    res.status(500).json({ message: "Failed to updated PostIt font" });
+  }
+};
+
+// Define the PostItData interface to include all possible fields
+interface PostItData {
+  postItId: string;
+  associatedBoardID: string;
+  groupId?: string | null;
+  posterUserID: string;
+  name?: string;
+  content?: string;
+  position?: { x: number; y: number };
+  size?: { width: number; height: number };
+  font?: string;
+  image?: string;
+  upvotedUsers?: Set<string>;
+  downvotedUsers?: Set<string>;
+  upvotes?: number;
+}
+
+export const copyPostIt = async (
+  req: AuthenticatedRequest,
+  res: Response,
+): Promise<void> => {
+  const userId = req.user?.uid; // Retrieve the UID from the authenticated request
+  const { postItId, boardId, targetGroupId } = req.body; // Extract boardName from the request body
+
+  if (!userId) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
+  if (!boardId) {
+    res.status(400).json({ message: "boardId is required" });
+    return;
+  }
+
+  if (!postItId) {
+    res.status(400).json({ message: "postItId is required" });
+    return;
+  }
+
+  try {
+    // Reference to the board
+    const boardRef = db.collection("Boards").doc(boardId);
+    const boardDoc = await boardRef.get();
+
+    if (!boardDoc.exists) {
+      res.status(404).json({ message: "Board not found" });
+      return;
+    }
+
+    const boardData = boardDoc.data();
+
+    // Check if the user is either the owner of the board or in the SharedUserIds array
+    const isAuthorized =
+      boardData?.workspaceOrganizerId === userId ||
+      (boardData?.SharedUserIds && boardData.SharedUserIds.includes(userId));
+
+    if (!isAuthorized) {
+      res.status(403).json({
+        message: "You are not authorized to add a Post-It to this board",
+      });
+      return;
+    }
+
+    // Fetch the original post-it
+    const postItRef = db.collection("PostIts").doc(postItId);
+    const postItDoc = await postItRef.get();
+
+    if (!postItDoc.exists) {
+      res.status(404).json({ message: "Post-it not found." });
+      return;
+    }
+
+    const postItData = postItDoc.data() as PostItData;
+
+    await db.runTransaction(async (transaction) => {
+      const newPostItId = db.collection("PostIts").doc().id;
+      const newPostItRef = db.collection("PostIts").doc(newPostItId);
+      const boardRef = db.collection("Boards").doc(boardId);
+
+      // Prepare new PostIt data
+      const newPostItData = {
+        ...postItData,
+        postItId: newPostItId,
+        associatedBoardID: boardId,
+        groupId: targetGroupId || null,
+        posterUserID: userId,
+      };
+
+      // Remove fields that should not be copied
+      delete newPostItData.upvotedUsers;
+      delete newPostItData.downvotedUsers;
+      delete newPostItData.upvotes;
+
+      // Set the new PostIt in Firestore
+      transaction.set(newPostItRef, newPostItData);
+
+      // Check if targetGroupId is provided
+      if (targetGroupId) {
+        // If a group is provided, check if it exists
+        const groupRef = boardRef.collection("Groups").doc(targetGroupId);
+        const groupDoc = await transaction.get(groupRef);
+
+        if (!groupDoc.exists) {
+          throw new Error("Group does not exist. Cancelling the operation.");
+        }
+
+        // If the group exists, add the new PostIt to the group
+        transaction.update(groupRef, {
+          postIts: firebaseAdmin.firestore.FieldValue.arrayUnion(newPostItRef),
+        });
+      } else {
+        // If no group is provided, add the PostIt to the unGroupedpostItList in the board
+        transaction.update(boardRef, {
+          unGroupedpostItList:
+            firebaseAdmin.firestore.FieldValue.arrayUnion(newPostItRef),
+        });
+      }
+    });
+
+    res.status(201).json({
+      message: "Post-it copied successfully.",
+      postItId: postItId,
+      postIt: postItData,
+    });
+  } catch (error: any) {
+    if (error as Error) {
+      // console.error("Error creating Post-It:", error);
+      res
+        .status(500)
+        .json({ message: "Failed to copy Post-It", error: error.message });
+    } else {
+      // console.error("Error creating Post-It:", error);
+      res.status(500).json({ message: "Failed to copy Post-It", error });
+    }
   }
 };
