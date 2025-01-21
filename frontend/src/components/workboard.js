@@ -13,6 +13,7 @@ const Workboard = () => {
   const [userToken, setUserToken] = useState();
   const [boardTitle, setBoardTitle] = useState();
   const [ungroupedPostIts, setUngroupedPostIts] = useState([]);
+  const [boards, setBoards] = useState([]); // List of boards
 
   const navigate = useNavigate();
   const { boardId } = useParams();
@@ -33,6 +34,11 @@ const Workboard = () => {
             setUsername(userData.username); // Set the username state
             const token = await user.getIdToken();
             setUserToken(token);
+
+            if (!boardId) {
+              fetchUserBoards(token); // Fetch list of boards if no boardId is in the URL
+            }
+
           } else {
             console.log("No such document!");
           }
@@ -41,7 +47,7 @@ const Workboard = () => {
         }
       }
     });
-  }, [navigate]);
+  }, [navigate, boardId]);
 
   // Fetch board data
   useEffect(() => {
@@ -78,6 +84,30 @@ const Workboard = () => {
       console.error("Error fetching board data:", error);
     }
   };
+
+  const fetchUserBoards = async (token) => {
+    try {
+      const backendUrl = getBackendUrl();
+      const response = await fetch(`${backendUrl}/api/board/getBoardList`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setBoards(data.boards || []);
+        // console.log(data.boards);
+      } else {
+        console.error("Failed to fetch boards:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error fetching boards:", error);
+    }
+  };
+
 
   const createNewBoard = async (groupName) => {
     try {
@@ -171,43 +201,62 @@ const Workboard = () => {
     <body className="board_body">
       <div className="toolbar_container">
         <div className="head_container">
-          <input
-            className="titletext"
-            value={boardTitle}
-            onChange={(e) => setBoardTitle(e.target.value)}
-            placeholder="Title:"
-          />
-
-          <h1 className="name_header">Ideation for All</h1>
-          <button className="account_button" onClick={accountPageNav}>
+          {boardId ? (
+            <>
+              <input
+                className="titletext"
+                value={boardTitle}
+                onChange={(e) => setBoardTitle(e.target.value)}
+                placeholder="Title:"
+              />
+              <h1 className="name_header">Ideation for All</h1>
+            </>
+          ) : (
+            <h1 className="name_header">Your Boards</h1>
+          )}
+          <button className="account_button" onClick={() => navigate("/edit-account")}>
             {username || "Account"}
           </button>
         </div>
-        <div className="options_container">
-          <button className="save_or_share_button">Save...</button>
-          <button className="save_or_share_button">Share</button>
-        </div>
         <div className="workspace_container">
-          <button className="workspace_button" onClick={addNote}>
-            Create new post-it
-          </button>
-          <button className="workspace_button">Create vote</button>
-          <button className="workspace_button">Groups</button>
-          <button className="workspace_button">People: 1</button>
+          {boardId ? (
+            <>
+              <button className="workspace_button" onClick={() => setPostits([])}>
+                Create new post-it
+              </button>
+              <button className="workspace_button">Create vote</button>
+              <button className="workspace_button">Groups</button>
+              <button className="workspace_button">People: 1</button>
+              {postits.map((item) => (
+                <PostIt
+                  key={item.postItId}
+                  id={item.postItId}
+                  name={item.name}
+                  content={item.content}
+                  position={item.position}
+                  votes={item.votes || 0}
+                  font={item.font}
+                  size={item.size}
+                  onClose={() => console.log("Delete", item.postItId)}
+                />
+              ))}
+            </>
+          ) : (
+            <ul className="board-list">
+              {boards.map((board) => (
+                <li key={board.boardId} className="board-item">
+                  <button
+                    className="navigate-button"
+                    onClick={() => navigate(`/workspace/${board.boardId}`)}
+                    title={board.name || "Untitled Board"} // Tooltip for long names
+                  >
+                    {board.name || "Untitled Board"}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
-        {postits.map((item) => (
-          <PostIt
-            key={item.postItId}
-            id={item.postItId}
-            name={item.name}
-            content={item.content}
-            position={item.position}
-            votes={item.votes || 0}
-            font={item.font}
-            size={item.size}
-            onClose={() => deletePostit(item.postItId)} // Call delete function on delete
-          />
-        ))}
       </div>
     </body>
   );

@@ -341,9 +341,13 @@ export const getBoardList = async (
     }
 
     // Combine references from OwnedBoards and SharedBoards
-    const boardRefs: FirebaseFirestore.DocumentReference[] = [
-      ...(userData.OwnedBoards || []),
-      ...(userData.SharedBoards || []),
+    const boardRefs = [
+      ...(userData.OwnedBoards || []).map((boardId: string) =>
+        db.collection("Boards").doc(boardId)
+      ),
+      ...(userData.SharedBoards || []).map((boardId: string) =>
+        db.collection("Boards").doc(boardId)
+      ),
     ];
 
     if (boardRefs.length === 0) {
