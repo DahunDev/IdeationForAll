@@ -94,7 +94,7 @@ const Workboard = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-      });
+      }); 
 
       if (response.ok) {
         const data = await response.json();
