@@ -32,7 +32,8 @@
   text-align: center;
   color: white;
   font-family: Verdana;
-}
+} 
+
 
 .options_container {
   display: flex;
@@ -142,4 +143,48 @@ textarea {
 
 .close:hover {
   opacity: 0.8;
+}
+
+.board-list-container {
+  padding: 1rem;
+}
+
+.board-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap; /* Wraps buttons to the next line if needed */
+  gap: 1rem; /* Adds spacing between buttons */
+}
+
+.board-item {
+  flex: 1 1 calc(25% - 1rem); /* Buttons take 25% of the row, minus spacing */
+  min-width: 150px; /* Ensure a minimum size */
+  max-width: 200px; /* Limit maximum size */
+}
+
+.navigate-button {
+  display: block;
+  width: 100%; /* Ensure the button fills the container */
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f8f9fa; /* Light background for buttons */
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.navigate-button:hover {
+  background-color: #e9ecef; /* Slightly darker background on hover */
+  color: #000;
+}
+
+.navigate-button:active {
+  background-color: #dee2e6; /* Active state */
+  color: #000;
 }
