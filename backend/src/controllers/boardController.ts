@@ -22,7 +22,18 @@ export const createBoard = async (
 
   try {
     // Create a new board document with an automatic ID
-    const boardRef = db.collection("Boards").doc(); // Creates a reference with an auto-generated ID
+
+    const existingBoards = await db
+      .collection("Boards")
+      .where("workspaceOrganizerId", "==", userId)
+      .where("name", "==", boardName)
+      .get();
+
+    if (!existingBoards.empty) {
+      res.status(400).json({ message: "Board with that name already exists" });
+      return;
+    }
+        const boardRef = db.collection("Boards").doc(); // Creates a reference with an auto-generated ID
     const boardId = boardRef.id; // Retrieve the auto-generated ID
 
     // Prepare the board data
@@ -82,6 +93,7 @@ export const getBoard = async (
     return;
   }
 
+  
   try {
     // Create a new board document with an automatic ID
     const boardRef = db.collection("Boards").doc(boardId);

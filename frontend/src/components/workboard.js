@@ -38,7 +38,6 @@ const Workboard = () => {
             if (!boardId) {
               fetchUserBoards(token); // Fetch list of boards if no boardId is in the URL
             }
-
           } else {
             console.log("No such document!");
           }
@@ -94,7 +93,7 @@ const Workboard = () => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-      }); 
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -108,8 +107,31 @@ const Workboard = () => {
     }
   };
 
+  const createNewBoard = async (boardName) => {
+    try {
+      const response = await fetch(`${getBackendUrl()}/api/board/createBoard`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userToken}`,
+        },
+        body: JSON.stringify({ boardName: boardName }),
+      });
+  
+      if (response.ok) {
+        const newBoard = await response.json();
+        navigate(`/workspace/${newBoard.boardId}`); // Redirect to the new board
+      } else {
+        const errorData = await response.json();
 
-  const createNewBoard = async (groupName) => {
+        alert(`Failed to create new board: ${errorData.message}`);
+      }
+    } catch (error) {
+      console.error("Error creating new board:", error);
+    }
+  };
+  
+  const createNewGroup = async (groupName) => {
     try {
       const response = await fetch(`${getBackendUrl()}/api/board/createGroup`, {
         method: "POST",
@@ -157,7 +179,7 @@ const Workboard = () => {
           { id: newPostIt.postItId, name: "New Post-It" },
         ]);
       } else {
-        console.error("Failed to create post-it:", response.statusText);
+        alert(`Failed to create post-it:, ${response.statusText}`);
       }
     } catch (error) {
       console.error("Error creating post-it:", error);
@@ -212,21 +234,40 @@ const Workboard = () => {
               <h1 className="name_header">Ideation for All</h1>
             </>
           ) : (
-            <h1 className="name_header">Your Boards</h1>
+            <>
+              <h1 className="name_header">Your Boards</h1>
+              <button
+                className="workspace_button"
+                onClick={async () => {
+                  const boardName = prompt("Enter board name:");
+                  if (boardName) {
+                    await createNewBoard(boardName);
+                  }
+                }}
+              >
+                Create Board
+              </button>{" "}
+            </>
           )}
-          <button className="account_button" onClick={() => navigate("/edit-account")}>
+          <button
+            className="account_button"
+            onClick={() => navigate("/edit-account")}
+          >
             {username || "Account"}
           </button>
         </div>
         <div className="workspace_container">
           {boardId ? (
             <>
-              <button className="workspace_button" onClick={() => setPostits([])}>
-                Create new post-it
-              </button>
               <button className="workspace_button">Create vote</button>
               <button className="workspace_button">Groups</button>
               <button className="workspace_button">People: 1</button>
+              <button
+                className="workspace_button"
+                onClick={() => navigate("/workspace")}
+              >
+                Go to Workspace Home
+              </button>
               {postits.map((item) => (
                 <PostIt
                   key={item.postItId}
