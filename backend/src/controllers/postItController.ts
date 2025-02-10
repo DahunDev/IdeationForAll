@@ -92,14 +92,13 @@ export const deletePostIt = async (
 ): Promise<void> => {
   const userId = req.user?.uid; // Retrieve the UID from the authenticated request
   const { postItId } = req.body; // Extract boardName from the request body
-
   if (!userId) {
     res.status(401).json({ message: "Unauthorized" });
     return;
   }
 
   if (!postItId) {
-    res.status(400).json({ message: "boardId name is required" });
+    res.status(400).json({ message: "postItId is required" }); // corrected message
     return;
   }
 
@@ -154,6 +153,12 @@ export const deletePostIt = async (
           firebaseAdmin.firestore.FieldValue.arrayRemove(postItRef),
       });
     }
+
+    // Commit the batch operation
+    await batch.commit();
+
+    // Send success response
+    res.status(200).json({ message: "PostIt deleted successfully" });
   } catch (error) {
     console.error("Error in batch deletion of PostIt:", error);
     res

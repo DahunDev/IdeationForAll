@@ -13,6 +13,7 @@ const Workboard = () => {
   const [userToken, setUserToken] = useState();
   const [boardTitle, setBoardTitle] = useState();
   const [ungroupedPostIts, setUngroupedPostIts] = useState([]);
+  const [boards, setBoards] = useState([]); // List of boards
 
   const navigate = useNavigate();
   const { boardId } = useParams();
@@ -25,7 +26,6 @@ const Workboard = () => {
       } else {
         console.log(user);
         try {
-          
           const userDoc = doc(db, "Users", user.uid); // Reference to the user document
           const userSnapshot = await getDoc(userDoc); // Fetch the document
 
@@ -35,6 +35,9 @@ const Workboard = () => {
             const token = await user.getIdToken();
             setUserToken(token);
 
+            if (!boardId) {
+              fetchUserBoards(token); // Fetch list of boards if no boardId is in the URL
+            }
           } else {
             console.log("No such document!");
           }
@@ -43,7 +46,7 @@ const Workboard = () => {
         }
       }
     });
-  }, [navigate]);
+  }, [navigate, boardId]);
 
   // Fetch board data
   useEffect(() => {
@@ -56,13 +59,16 @@ const Workboard = () => {
     try {
       const backendUrl = getBackendUrl();
 
-      const response = await fetch(`${backendUrl}/api/board/getBoard?boardId=${encodeURIComponent(boardId)}`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userToken}`,
+      const response = await fetch(
+        `${backendUrl}/api/board/getBoard?boardId=${encodeURIComponent(boardId)}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userToken}`,
+          },
         },
-      });
+      );
 
       if (response.ok) {
         const boardData = await response.json();
@@ -78,7 +84,54 @@ const Workboard = () => {
     }
   };
 
-  const createNewBoard = async (groupName) => {
+  const fetchUserBoards = async (token) => {
+    try {
+      const backendUrl = getBackendUrl();
+      const response = await fetch(`${backendUrl}/api/board/getBoardList`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setBoards(data.boards || []);
+        // console.log(data.boards);
+      } else {
+        console.error("Failed to fetch boards:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error fetching boards:", error);
+    }
+  };
+
+  const createNewBoard = async (boardName) => {
+    try {
+      const response = await fetch(`${getBackendUrl()}/api/board/createBoard`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userToken}`,
+        },
+        body: JSON.stringify({ boardName: boardName }),
+      });
+  
+      if (response.ok) {
+        const newBoard = await response.json();
+        navigate(`/workspace/${newBoard.boardId}`); // Redirect to the new board
+      } else {
+        const errorData = await response.json();
+
+        alert(`Failed to create new board: ${errorData.message}`);
+      }
+    } catch (error) {
+      console.error("Error creating new board:", error);
+    }
+  };
+  
+  const createNewGroup = async (groupName) => {
     try {
       const response = await fetch(`${getBackendUrl()}/api/board/createGroup`, {
         method: "POST",
@@ -107,14 +160,17 @@ const Workboard = () => {
 
   const addNote = async () => {
     try {
-      const response = await fetch(`${getBackendUrl()}/api/postit/createPostIt`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userToken}`,
+      const response = await fetch(
+        `${getBackendUrl()}/api/postit/createPostIt`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userToken}`,
+          },
+          body: JSON.stringify({ name: "New Post-It", boardId }),
         },
-        body: JSON.stringify({ name: "New Post-It", boardId }),
-      });
+      );
 
       if (response.ok) {
         const newPostIt = await response.json();
@@ -123,29 +179,38 @@ const Workboard = () => {
           { id: newPostIt.postItId, name: "New Post-It" },
         ]);
       } else {
-        console.error("Failed to create post-it:", response.statusText);
+        alert(`Failed to create post-it:, ${response.statusText}`);
       }
     } catch (error) {
       console.error("Error creating post-it:", error);
     }
   };
 
-
-  const deletePostit = async (postitId) => {
+  const deletePostit = async (postItId) => {
     try {
       // Make API call to delete the post-it
-      const response = await fetch(`${getBackendUrl()}/api/postit/deletePostIt`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userToken}`, // Assuming userToken is stored in state or context
+      const response = await fetch(
+        `${getBackendUrl()}/api/postit/deletePostIt`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userToken}`, // Assuming userToken is stored in state or context
+          },
+          body: JSON.stringify({ postItId }),
         },
-        body: JSON.stringify({ postitId }),
-      });
-  
+      );
+      console.log("Deleting PostIt with ID:", postItId, `Bearer ${userToken}`); // Log the ID being sent
+
       if (response.ok) {
         // If the API call was successful, update the state
-        setPostits((prevPostits) => prevPostits.filter((item) => item.id !== postitId));
+        setPostits((prevPostits) => {
+          const updatedPostIts = prevPostits.filter(
+            (item) => item.postItId !== postItId,
+          );
+          // console.log("After update", updatedPostIts);
+          return updatedPostIts;
+        });
       } else {
         console.error("Failed to delete post-it:", response.statusText);
       }
@@ -155,49 +220,86 @@ const Workboard = () => {
   };
 
   return (
-      <body className="board_body">
-        <div className="toolbar_container">
-          <div className="head_container">
-          <input
-            className="titletext"
-            value={boardTitle}
-            onChange={(e) => setBoardTitle(e.target.value)}
-            placeholder="Title:"
-          />
-          
-          <h1 className="name_header">Ideation for All</h1>
-            <button className="account_button" onClick={accountPageNav}>
-              {username || "Account"}
-            </button>
-          </div>
-          <div className="options_container">
-            <button className="save_or_share_button">Save...</button>
-            <button className="save_or_share_button">Share</button>
-          </div>
-          <div className="workspace_container">
-            <button className="workspace_button" onClick={addNote}>
-              Create new post-it
-            </button>
-            <button className="workspace_button">Create vote</button>
-            <button className="workspace_button">Groups</button>
-            <button className="workspace_button">People: 1</button>
-          </div>
-          {postits.map((item) => (
-            
-            <PostIt
-              key={item.postItId}
-              id={item.postItId}
-              name={item.name}
-              content={item.content}
-              position={item.position}
-              votes={item.votes || 0}
-              font={item.font}
-              size={item.size}
-              onClose={() => deletePostit(item.postItId)} // Call delete function on delete
-            />
-          ))}
+    <body className="board_body">
+      <div className="toolbar_container">
+        <div className="head_container">
+          {boardId ? (
+            <>
+              <input
+                className="titletext"
+                value={boardTitle}
+                onChange={(e) => setBoardTitle(e.target.value)}
+                placeholder="Title:"
+              />
+              <h1 className="name_header">Ideation for All</h1>
+            </>
+          ) : (
+            <>
+              <h1 className="name_header">Your Boards</h1>
+              <button
+                className="workspace_button"
+                onClick={async () => {
+                  const boardName = prompt("Enter board name:");
+                  if (boardName) {
+                    await createNewBoard(boardName);
+                  }
+                }}
+              >
+                Create Board
+              </button>{" "}
+            </>
+          )}
+          <button
+            className="account_button"
+            onClick={() => navigate("/edit-account")}
+          >
+            {username || "Account"}
+          </button>
         </div>
-      </body>
+        <div className="workspace_container">
+          {boardId ? (
+            <>
+              <button className="workspace_button">Create vote</button>
+              <button className="workspace_button">Groups</button>
+              <button className="workspace_button">People: 1</button>
+              <button
+                className="workspace_button"
+                onClick={() => navigate("/workspace")}
+              >
+                Go to Workspace Home
+              </button>
+              {postits.map((item) => (
+                <PostIt
+                  key={item.postItId}
+                  id={item.postItId}
+                  name={item.name}
+                  content={item.content}
+                  position={item.position}
+                  votes={item.votes || 0}
+                  font={item.font}
+                  size={item.size}
+                  onClose={() => console.log("Delete", item.postItId)}
+                />
+              ))}
+            </>
+          ) : (
+            <ul className="board-list">
+              {boards.map((board) => (
+                <li key={board.boardId} className="board-item">
+                  <button
+                    className="navigate-button"
+                    onClick={() => navigate(`/workspace/${board.boardId}`)}
+                    title={board.name || "Untitled Board"} // Tooltip for long names
+                  >
+                    {board.name || "Untitled Board"}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+    </body>
   );
 };
 export default Workboard;
