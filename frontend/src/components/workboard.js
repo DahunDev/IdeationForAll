@@ -200,7 +200,7 @@ const Workboard = () => {
           body: JSON.stringify({ postItId }),
         },
       );
-      console.log("Deleting PostIt with ID:", postItId, `Bearer ${userToken}`); // Log the ID being sent
+      // console.log("Deleting PostIt with ID:", postItId, `Bearer ${userToken}`); // Log the ID being sent
 
       if (response.ok) {
         // If the API call was successful, update the state
@@ -280,7 +280,7 @@ const Workboard = () => {
                   font={item.font}
                   position={item.position}
                   size={item.size}
-                  onClose={() => console.log("Delete", item.postItId)}
+                  onClose={() => deletePostit(item.postItId)}
                 />
               ))}
             </>
