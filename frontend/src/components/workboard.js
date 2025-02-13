@@ -270,13 +270,15 @@ const Workboard = () => {
               </button>
               {postits.map((item) => (
                 <PostIt
-                  key={item.postItId}
-                  id={item.postItId}
+                  id={item.id}
+                  boardID={item.boardID}
                   name={item.name}
+                  userID={item.userID}
                   content={item.content}
-                  position={item.position}
-                  votes={item.votes || 0}
+                  groupID={item.groupID}
+                  imageLink={item.imageLink}
                   font={item.font}
+                  position={item.position}
                   size={item.size}
                   onClose={() => console.log("Delete", item.postItId)}
                 />

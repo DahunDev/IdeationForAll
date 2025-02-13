@@ -15,20 +15,20 @@
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:frontend\\src\\components\\workboard.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\anton\\Documents\\GitHub\\IdeationForAll\\frontend\\src\\App.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:frontend\\src\\App.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\anton\\Documents\\GitHub\\IdeationForAll\\frontend\\src\\components\\RegisterPage.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:frontend\\src\\components\\RegisterPage.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\anton\\Documents\\GitHub\\IdeationForAll\\frontend\\src\\components\\loginPage.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:frontend\\src\\components\\loginPage.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\anton\\Documents\\GitHub\\IdeationForAll\\frontend\\src\\index.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
       "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:frontend\\src\\index.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\anton\\Documents\\GitHub\\IdeationForAll\\frontend\\src\\App.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:frontend\\src\\App.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\anton\\Documents\\GitHub\\IdeationForAll\\frontend\\src\\components\\RegisterPage.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:frontend\\src\\components\\RegisterPage.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\anton\\Documents\\GitHub\\IdeationForAll\\frontend\\src\\components\\RegisterPage.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
@@ -62,8 +62,7 @@
               "RelativeToolTip": "frontend\\src\\components\\loginPage.css",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2024-10-24T22:45:18.77Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-10-24T22:45:18.77Z"
             },
             {
               "$type": "Document",
@@ -75,12 +74,11 @@
               "RelativeToolTip": "frontend\\src\\components\\RegisterPage.css",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2024-10-24T22:41:12.69Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-10-24T22:41:12.69Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 6,
               "Title": "RegisterPage.js",
               "DocumentMoniker": "C:\\Users\\anton\\Documents\\GitHub\\IdeationForAll\\frontend\\src\\components\\RegisterPage.js",
               "RelativeDocumentMoniker": "frontend\\src\\components\\RegisterPage.js",
@@ -88,8 +86,7 @@
               "RelativeToolTip": "frontend\\src\\components\\RegisterPage.js",
               "ViewState": "AQIAACQAAAAAAAAAAAAAABsAAAAmAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2024-10-24T20:45:23.604Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-10-24T20:45:23.604Z"
             },
             {
               "$type": "Document",
@@ -101,12 +98,11 @@
               "RelativeToolTip": "backend\\src\\server.ts",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAYAAAAfAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2024-10-24T20:22:59.656Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-10-24T20:22:59.656Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 5,
               "Title": "App.js",
               "DocumentMoniker": "C:\\Users\\anton\\Documents\\GitHub\\IdeationForAll\\frontend\\src\\App.js",
               "RelativeDocumentMoniker": "frontend\\src\\App.js",
@@ -114,12 +110,11 @@
               "RelativeToolTip": "frontend\\src\\App.js",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAA4AAAAKAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2024-10-24T20:06:15.511Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-10-24T20:06:15.511Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 3,
               "Title": "loginPage.js",
               "DocumentMoniker": "C:\\Users\\anton\\Documents\\GitHub\\IdeationForAll\\frontend\\src\\components\\loginPage.js",
               "RelativeDocumentMoniker": "frontend\\src\\components\\loginPage.js",
@@ -132,7 +127,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 4,
               "Title": "index.js",
               "DocumentMoniker": "C:\\Users\\anton\\Documents\\GitHub\\IdeationForAll\\frontend\\src\\index.js",
               "RelativeDocumentMoniker": "frontend\\src\\index.js",
@@ -151,7 +146,7 @@
               "RelativeDocumentMoniker": "frontend\\src\\components\\workboard.js",
               "ToolTip": "C:\\Users\\anton\\Documents\\GitHub\\IdeationForAll\\frontend\\src\\components\\workboard.js",
               "RelativeToolTip": "frontend\\src\\components\\workboard.js",
-              "ViewState": "AQIAAAQAAAAAAAAAAAAwwBgAAAA/AAAA",
+              "ViewState": "AQIAANgAAAAAAAAAAAAAAOAAAAAiAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
               "WhenOpened": "2024-10-24T19:32:47.937Z",
               "EditorCaption": ""
@@ -164,7 +159,7 @@
               "RelativeDocumentMoniker": "frontend\\src\\components\\workboard.css",
               "ToolTip": "C:\\Users\\anton\\Documents\\GitHub\\IdeationForAll\\frontend\\src\\components\\workboard.css",
               "RelativeToolTip": "frontend\\src\\components\\workboard.css",
-              "ViewState": "AQIAAGAAAAAAAAAAAAAAAHAAAAAPAAAA",
+              "ViewState": "AQIAAGAAAAAAAAAAAAAAAHAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
               "WhenOpened": "2024-10-24T19:32:17.927Z",
               "EditorCaption": ""
@@ -177,7 +172,7 @@
               "RelativeDocumentMoniker": "frontend\\src\\components\\functions\\PostIts.jsx",
               "ToolTip": "C:\\Users\\anton\\Documents\\GitHub\\IdeationForAll\\frontend\\src\\components\\functions\\PostIts.jsx",
               "RelativeToolTip": "frontend\\src\\components\\functions\\PostIts.jsx",
-              "ViewState": "AQIAABIAAAAAAAAAAAAowCMAAAAmAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAACYAAAAHAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003663|",
               "WhenOpened": "2024-10-28T21:51:20.248Z",
               "EditorCaption": ""
