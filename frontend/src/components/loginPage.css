@@ -1,0 +1,98 @@
+/* LoginPage.css */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #e4a662;
+    text-align: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.toolbar_container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+}
+
+.head_container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: deepskyblue;
+    width: 100%;
+    padding: 10px;
+}
+
+.name_header {
+    text-align: center;
+    color: white;
+    font-family: Verdana;
+    flex-grow: 1;
+}
+
+.workspace_container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: gray;
+    border: 3px solid black;
+    width: 100%;
+    padding: 20px;
+}
+
+.login_section {
+    margin: 20px 0;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    width: 50%;
+    max-width: 400px;
+}
+
+.titletext {
+    padding: 9px;
+    font-size: 18px;
+    width: 100%;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.workspace_button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: yellow;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 250px;
+    margin: 10px auto;
+    display: block;
+}
+
+.account_button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: gray;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    max-width: 250px;
+    margin: 10px;
+}
