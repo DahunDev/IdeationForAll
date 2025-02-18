@@ -117,7 +117,7 @@ const Workboard = () => {
         },
         body: JSON.stringify({ boardName: boardName }),
       });
-  
+
       if (response.ok) {
         const newBoard = await response.json();
         navigate(`/workspace/${newBoard.boardId}`); // Redirect to the new board
@@ -130,7 +130,7 @@ const Workboard = () => {
       console.error("Error creating new board:", error);
     }
   };
-  
+
   const createNewGroup = async (groupName) => {
     try {
       const response = await fetch(`${getBackendUrl()}/api/board/createGroup`, {
