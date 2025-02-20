@@ -1,4 +1,3 @@
-// EditAccount.js
 import React, { useEffect, useState } from "react";
 import "./editAccountPage.css";
 import { useNavigate } from "react-router-dom";
@@ -8,122 +7,121 @@ import axios from "axios";
 import { auth } from "../configs/firebaseConfig";
 
 const EditAccountPage = () => {
-  const [username, setUsername] = useState("");
-  const [newEmail, setNewEmail] = useState("");
-  const [token, setToken] = useState("");
+    const [username, setUsername] = useState("");
+    const [newEmail, setNewEmail] = useState("");
+    const [token, setToken] = useState("");
 
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  useEffect(() => {
-    // Check if user is logged in and get token
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const userToken = await user.getIdToken();
-        setToken(userToken);
-      } else {
-        navigate("/login"); // Redirect to login if not logged in
-      }
-    });
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const userToken = await user.getIdToken();
+                setToken(userToken);
+            } else {
+                navigate("/login");
+            }
+        });
 
-    return () => unsubscribe(); // Cleanup on component unmount
-  }, [navigate]);
+        return () => unsubscribe();
+    }, [navigate]);
 
-  const handleUpdateUsername = async (e) => {
-    e.preventDefault();
-    try {
-      const backendUrl = getBackendUrl();
-      if (!backendUrl) {
-        throw new Error(
-          "Backend URL is not set. Make sure server settings are loaded.",
-        );
-      }
+    const handleUpdateUsername = async (e) => {
+        e.preventDefault();
+        try {
+            const backendUrl = getBackendUrl();
+            if (!backendUrl) {
+                throw new Error("Backend URL is not set. Make sure server settings are loaded.");
+            }
 
-      // console.log("call rest api to update updateUsername");
-      const response = await axios.put(
-        `${backendUrl}/api/user/updateUsername`,
-        { username },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-      // console.log("Full response:", response);
+            const response = await axios.put(
+                `${backendUrl}/api/user/updateUsername`,
+                { username },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
 
-      alert(response.data.message || "username updated successfully!");
-    } catch (error) {
-      console.error("Error updating username:", error);
-      alert(error.response?.data?.message || "Failed to update username");
-    }
-  };
+            alert(response.data.message || "Username updated successfully!");
+        } catch (error) {
+            console.error("Error updating username:", error);
+            alert(error.response?.data?.message || "Failed to update username");
+        }
+    };
 
-  const handleChangeEmail = async (e) => {
-    e.preventDefault();
-    try {
-      const backendUrl = getBackendUrl();
-      if (!backendUrl) {
-        throw new Error(
-          "Backend URL is not set. Make sure server settings are loaded.",
-        );
-      }
+    const handleChangeEmail = async (e) => {
+        e.preventDefault();
+        try {
+            const backendUrl = getBackendUrl();
+            if (!backendUrl) {
+                throw new Error("Backend URL is not set. Make sure server settings are loaded.");
+            }
 
-      // console.log("call rest api to update email");
-      const response = await axios.put(
-        `${backendUrl}/api/user/updateEmail`,
-        { newEmail },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-      // console.log("Full response:", response);
-      // Refresh token after updating email
-      alert(
-        response.data.message ||
-          "Email updated successfully. Due to secruity policy, need to sign in again!",
-      );
-    } catch (error) {
-      console.error("Error updating email:", error);
-      alert(error.response?.data?.message || "Failed to update email");
-    }
-  };
+            const response = await axios.put(
+                `${backendUrl}/api/user/updateEmail`,
+                { newEmail },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
 
-  return (
-    <div className="container">
-      <h1>Ideation For All</h1>
+            alert(
+                response.data.message || "Email updated successfully. Due to security policy, you need to sign in again!"
+            );
+        } catch (error) {
+            console.error("Error updating email:", error);
+            alert(error.response?.data?.message || "Failed to update email");
+        }
+    };
 
-      <div className="section">
-        <h2>Update Name</h2>
-        <form onSubmit={handleUpdateUsername}>
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-          <button type="submit">Update Username</button>
-        </form>
-      </div>
-
-      <div className="section">
-        <h2>Change Email</h2>
-        <form onSubmit={handleChangeEmail}>
-          <input
-            type="email"
-            placeholder="New Email Address"
-            value={newEmail}
-            onChange={(e) => setNewEmail(e.target.value)}
-            required
-          />
-          <button type="submit">Change Email</button>
-        </form>
-      </div>
-    </div>
-  );
+    return (
+        <body className="board_body">
+            <div className="toolbar_container">
+                <div className="head_container">
+                    <h1 className="name_header">Ideation for All</h1>
+                    <button className="account_button" onClick={() => navigate("/workspace")}>
+                        Back to Workspace
+                    </button>
+                </div>
+                <div className="workspace_container">
+                    <div className="edit_account_section">
+                        <h2>Update Name</h2>
+                        <form onSubmit={handleUpdateUsername}>
+                            <input
+                                type="text"
+                                placeholder="Username"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                required
+                                className="titletext"
+                            />
+                            <button type="submit" className="workspace_button">Update Username</button>
+                        </form>
+                    </div>
+                    <div className="edit_account_section">
+                        <h2>Change Email</h2>
+                        <form onSubmit={handleChangeEmail}>
+                            <input
+                                type="email"
+                                placeholder="New Email Address"
+                                value={newEmail}
+                                onChange={(e) => setNewEmail(e.target.value)}
+                                required
+                                className="titletext"
+                            />
+                            <button type="submit" className="workspace_button">Change Email</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </body>
+    );
 };
 
 export default EditAccountPage;
