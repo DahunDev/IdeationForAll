@@ -75,30 +75,44 @@ async function isUserAuthorized(
 
 const DEBOUNCE_WAIT = 500; // Debounce delay in milliseconds
 
-// Firestore update function with debouncing
 export async function updatePostItInFirestore(
   postItId: string,
   updates: PostItUpdate,
   userId: string,
 ): Promise<void> {
-  const postItRef = firebaseAdmin
-    .firestore()
-    .collection("PostIts")
-    .doc(postItId);
-  const postItDoc = await postItRef.get();
+  const postItRef = firebaseAdmin.firestore().collection("PostIts").doc(postItId);
 
-  if (!postItDoc.exists) {
-    throw new Error("PostIt does not exist");
+  try {
+    await firebaseAdmin.firestore().runTransaction(async (transaction) => {
+      const postItDoc = await transaction.get(postItRef);
+
+      if (!postItDoc.exists) {
+        throw new Error("Post-it does not exist");
+      }
+
+      const postItData = postItDoc.data();
+      if (!postItData) return;
+
+      // Authorization check: Only allow update if user is authorized
+      let isAllowed = await isUserAuthorized(userId, postItDoc);
+      if (!isAllowed) {
+        throw new Error("Unauthorized update attempt");
+      }
+
+      // Merge updates while preserving existing fields
+      const newData = { 
+        ...postItData, 
+        ...updates, 
+        lastEditedBy: userId, 
+        updatedAt: new Date() 
+      };
+
+      // Perform the update inside the transaction
+      transaction.update(postItRef, newData);
+    });
+
+    console.log(`Post-it ${postItId} updated successfully by ${userId}`);
+  } catch (error) {
+    console.error("Error updating post-it:", error);
   }
-
-  const postItData = postItDoc.data();
-
-  // Authorization check: Only allow update if user is authorized
-  let isAllowed = await isUserAuthorized(userId, postItDoc);
-  if (!isAllowed) {
-    throw new Error("Unauthorized update attempt");
-  }
-
-  // Perform the update
-  await postItRef.update(updates);
 }

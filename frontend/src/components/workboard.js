@@ -20,7 +20,7 @@ const Workboard = () => {
 
   useEffect(() => {
     // Check if user is logged in
-    onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (!user) {
         navigate("/login"); // Redirect to login if not logged in
       } else {
@@ -46,6 +46,7 @@ const Workboard = () => {
         }
       }
     });
+    return () => unsubscribe(); // Cleanup listener on unmount
   }, [navigate, boardId]);
 
   // Fetch board data
@@ -274,7 +275,7 @@ const Workboard = () => {
                   boardID={item.boardID}
                   name={item.name}
                   userID={item.userID}
-                  content={item.content}
+                  content={item.content || ""}
                   groupID={item.groupID}
                   imageLink={item.imageLink}
                   font={item.font}

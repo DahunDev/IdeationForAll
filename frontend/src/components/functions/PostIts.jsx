@@ -1,10 +1,11 @@
 import { useState, useRef } from "react";
+import { sendUpdate } from "../../utils/websocket";
 
 export default function PostIt({
   id,
   boardID,
   name,
-  userID,
+  idToken,
   content,
   groupID,
   imageLink,
@@ -14,6 +15,8 @@ export default function PostIt({
   onClose,
 }) {
   const [move, setMove] = useState(false);
+  const [text, setText] = useState(content); // Controlled state
+
   const postitRef = useRef();
 
   const [dx, setDx] = useState(0);
@@ -25,6 +28,9 @@ export default function PostIt({
   }
   function mouseUp() {
     setMove(false);
+    if (idToken) {
+      sendUpdate(id, { position }, idToken); // Send update to backend
+    }
     console.log("stop moving");
   }
   function mouseDown(e) {
@@ -33,6 +39,12 @@ export default function PostIt({
     setDx(e.clientX - coordinates.x);
     setDy(e.clientY - coordinates.y);
     console.log("start moving");
+  }
+
+  function handleBlur() {
+    if (idToken) {
+      sendUpdate(id, { content: text }, idToken);
+    }
   }
 
   function mouseMove(e) {
@@ -62,9 +74,11 @@ export default function PostIt({
           &times;
         </div>
       </div>
-      <textarea cols="30" rows="10">
-        {content}
-      </textarea>
+      <textarea
+        value={text} // Ensure it's a controlled input
+        onChange={(e) => setText(e.target.value)}
+        onBlur={handleBlur}
+      />
     </div>
   );
 }
