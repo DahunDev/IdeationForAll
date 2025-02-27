@@ -6,6 +6,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "../configs/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { getBackendUrl } from "../configs/serverSettings";
+import { connectWebSocket } from "../utils/websocket";
 
 const Workboard = () => {
   const [postits, setPostits] = useState([]);
@@ -37,6 +38,13 @@ const Workboard = () => {
 
             if (!boardId) {
               fetchUserBoards(token); // Fetch list of boards if no boardId is in the URL
+            }
+
+                      // Now that the backend URL is set, connect WebSocket
+            if (getBackendUrl()) {
+              connectWebSocket(getBackendUrl()); // Make sure backendUrl is valid
+            } else {
+              console.error("No backend URL set.");
             }
           } else {
             console.log("No such document!");
@@ -271,10 +279,11 @@ const Workboard = () => {
               </button>
               {postits.map((item) => (
                 <PostIt
-                  id={item.id}
+                  postItId={item.postItId}
                   boardID={item.boardID}
                   name={item.name}
                   userID={item.userID}
+                  idToken={userToken}
                   content={item.content || ""}
                   groupID={item.groupID}
                   imageLink={item.imageLink}

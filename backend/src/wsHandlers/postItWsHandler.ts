@@ -11,7 +11,7 @@ export function handlePostItWs(socket: Socket) {
     async (data: { postItId: string; updates: PostItUpdate; idToken: string }, callback) => {
       try {
         const { postItId, updates, idToken } = data;
-  
+        // console.log(JSON.stringify(postItId) + " " + data + " postItId: " + postItId + " updates: " + updates + " idToken: " + idToken);
         if (!postItId || !updates || !idToken) {
           throw new Error("Invalid update data");
         }    

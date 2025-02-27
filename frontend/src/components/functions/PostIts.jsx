@@ -1,8 +1,8 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { sendUpdate } from "../../utils/websocket";
 
 export default function PostIt({
-  id,
+  postItId,
   boardID,
   name,
   idToken,
@@ -18,6 +18,7 @@ export default function PostIt({
   const [text, setText] = useState(content); // Controlled state
 
   const postitRef = useRef();
+  const timeoutRef = useRef(null);
 
   const [dx, setDx] = useState(0);
   const [dy, setDy] = useState(0);
@@ -26,12 +27,26 @@ export default function PostIt({
     postitRef.current.style.left = position.x + "px";
     postitRef.current.style.right = position.x + "px";
   }
+
+
+  // Apply position when component mounts
+  useEffect(() => {
+    if (postitRef.current && position) {
+      postitRef.current.style.left = `${position.x}px`;
+      postitRef.current.style.top = `${position.y}px`;
+    }
+  }, [position]); // Runs whenever `position` updates
+
+
   function mouseUp() {
     setMove(false);
     if (idToken) {
-      sendUpdate(id, { position }, idToken); // Send update to backend
+      sendUpdate(postItId, { position }, idToken); // Send update to backend
+      console.log("Send update, " + position);
+    }else{
+      console.log("no idToken" + position);
     }
-    console.log("stop moving");
+    console.log("sto moving, postid: " + postItId);
   }
   function mouseDown(e) {
     setMove(true);
@@ -41,11 +56,20 @@ export default function PostIt({
     console.log("start moving");
   }
 
-  function handleBlur() {
-    if (idToken) {
-      sendUpdate(id, { content: text }, idToken);
-    }
+  function handleTextChange(e) {
+    const newText = e.target.value;
+    setText(newText);
+
+    // Debounce updates to avoid sending too many requests
+    clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      if (idToken) {
+        sendUpdate(postItId, { content: newText }, idToken);
+        console.log("Send update:", newText);
+      }
+    }, 500); // Adjust debounce time as needed
   }
+
 
   function mouseMove(e) {
     if (move) {
@@ -76,8 +100,8 @@ export default function PostIt({
       </div>
       <textarea
         value={text} // Ensure it's a controlled input
-        onChange={(e) => setText(e.target.value)}
-        onBlur={handleBlur}
+        onChange={handleTextChange}
+        // onBlur={handleBlur}
       />
     </div>
   );
