@@ -10,13 +10,14 @@ import {
   signOut,
 } from "firebase/auth";
 import { Navigate, useNavigate } from "react-router-dom";
-import "./loginPage.css";
+import classes from "./loginPage.module.css";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const [prompted, setPrompted] = useState(false); // Track if prompt has been shown
+  const [error, setError] = useState("");
 
   const [isLoggingIn, setIsLoggingIn] = useState(false); // Flag to check if user is logging in
   const [LoggedInByManually, setLoggedInByManually] = useState(false); // Flag to check if user is logging in
@@ -68,16 +69,17 @@ const LoginPage = () => {
               setPrompted(true);
               setLoggedInByManually(true);
               const user = userCredential.user;
-              document.getElementById("login-fail").style.display = "none";
+              // document.getElementById("login-fail").style.display = "none";
               navigate("/workspace");
             } else {
               // Handle case where userCredential or user is missing
               console.error(
                 "Unexpected login failure, no user credential returned.",
               );
-              document.getElementById("login-fail-message").innerText =
-                "Login failed. Please try again.";
-              document.getElementById("login-fail").style.display = "block";
+              setError("Login failed. Please try again.");
+              // document.getElementById("login-fail-message").innerText =
+              //   "Login failed. Please try again.";
+              // document.getElementById("login-fail").style.display = "block";
             }
           })
           .catch((signInError) => {
@@ -85,25 +87,32 @@ const LoginPage = () => {
             console.log("Error Code:", errorCode);
 
             if (errorCode === "auth/invalid-email") {
-              document.getElementById("login-fail-message").innerText =
-                "Invalid email.";
+              // document.getElementById("login-fail-message").innerText =
+              //   "Invalid email.";
+              setError("Invalid email.");
             } else if (errorCode === "auth/invalid-credential") {
-              document.getElementById("login-fail-message").innerText =
-                "Failed to login, make sure email and password are correct.";
+              setError(
+                "Failed to login, make sure email and password are correct.",
+              );
+
+              // document.getElementById("login-fail-message").innerText =
+              //   "Failed to login, make sure email and password are correct.";
             } else {
-              document.getElementById("login-fail-message").innerText =
-                "Error occurred. Try again.";
+              setError("Error occurred. Try again.");
+              // document.getElementById("login-fail-message").innerText =
+              //   "Error occurred. Try again.";
             }
-            document.getElementById("login-fail").style.display = "block";
+            // document.getElementById("login-fail").style.display = "block";
           });
       })
       .catch((setPersistenceError) => {
         console.log("Persistence error:", setPersistenceError);
         const errorCode =
           setPersistenceError?.code || "unknown-persistence-error";
-        document.getElementById("login-fail-message").innerText =
-          "Error setting persistence. Try again.";
-        document.getElementById("login-fail").style.display = "block";
+        setError("Error setting persistence. Try again.");
+        // document.getElementById("login-fail-message").innerText =
+        //   "Error setting persistence. Try again.";
+        // document.getElementById("login-fail").style.display = "block";
         console.log("Error Code:", errorCode);
       })
       .finally(() => {
@@ -112,45 +121,58 @@ const LoginPage = () => {
   };
 
   return (
-    <div>
-      <h2>Login - Ideation For All</h2>
-      <form onSubmit={handleLogin}>
-        <input
-          type="text"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit">Login</button>
-        <aside className="goto-forget-password">
-          <a
-            className="goto-login-item"
-            id="resetPW-button2"
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              resetPassword(email);
-            }}
-            style={{ marginRight: "15px" }} // Add space between the two links
+    <body className={classes.board_body}>
+      <div className={classes.toolbar_container}>
+        <div className={classes.head_container}>
+          <h1 className={classes.name_header}>Ideation for All</h1>
+          <button
+            className={classes.account_button}
+            onClick={() => navigate("/register")}
           >
-            Forgot Username/Password?
-          </a>
-          <a href="/register">Register New Account</a>
-        </aside>
-
-        <div id="login-fail">
-          <p id="login-fail-message"></p>
+            Register
+          </button>
         </div>
-      </form>
-    </div>
+        <div className={classes.workspace_container}>
+          <div className={classes.login_section}>
+            <h2>Login</h2>
+            <form onSubmit={handleLogin}>
+              <input
+                type="text"
+                className={classes.titletext}
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <input
+                type="password"
+                className={classes.titletext}
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button type="submit" className={classes.workspace_button}>
+                Login
+              </button>
+            </form>
+            {error && <p style={{ color: "red" }}>{error}</p>}
+            <aside className={classes["goto-forget-password"]}>
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  resetPassword(email);
+                }}
+              >
+                Forgot Password?
+              </a>
+              <a href="/register">Register New Account</a>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </body>
   );
 };
 

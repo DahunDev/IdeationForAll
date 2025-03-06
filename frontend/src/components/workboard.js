@@ -6,6 +6,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "../configs/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import { getBackendUrl } from "../configs/serverSettings";
+import { connectWebSocket } from "../utils/websocket";
 
 const Workboard = () => {
   const [postits, setPostits] = useState([]);
@@ -20,7 +21,7 @@ const Workboard = () => {
 
   useEffect(() => {
     // Check if user is logged in
-    onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (!user) {
         navigate("/login"); // Redirect to login if not logged in
       } else {
@@ -38,6 +39,13 @@ const Workboard = () => {
             if (!boardId) {
               fetchUserBoards(token); // Fetch list of boards if no boardId is in the URL
             }
+
+                      // Now that the backend URL is set, connect WebSocket
+            if (getBackendUrl()) {
+              connectWebSocket(getBackendUrl()); // Make sure backendUrl is valid
+            } else {
+              console.error("No backend URL set.");
+            }
           } else {
             console.log("No such document!");
           }
@@ -46,6 +54,7 @@ const Workboard = () => {
         }
       }
     });
+    return () => unsubscribe(); // Cleanup listener on unmount
   }, [navigate, boardId]);
 
   // Fetch board data
@@ -117,7 +126,7 @@ const Workboard = () => {
         },
         body: JSON.stringify({ boardName: boardName }),
       });
-  
+
       if (response.ok) {
         const newBoard = await response.json();
         navigate(`/workspace/${newBoard.boardId}`); // Redirect to the new board
@@ -130,7 +139,7 @@ const Workboard = () => {
       console.error("Error creating new board:", error);
     }
   };
-  
+
   const createNewGroup = async (groupName) => {
     try {
       const response = await fetch(`${getBackendUrl()}/api/board/createGroup`, {
@@ -270,11 +279,12 @@ const Workboard = () => {
               </button>
               {postits.map((item) => (
                 <PostIt
-                  id={item.id}
+                  postItId={item.postItId}
                   boardID={item.boardID}
                   name={item.name}
                   userID={item.userID}
-                  content={item.content}
+                  idToken={userToken}
+                  content={item.content || ""}
                   groupID={item.groupID}
                   imageLink={item.imageLink}
                   font={item.font}
