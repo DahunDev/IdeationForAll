@@ -79,7 +79,7 @@ export const createPostIt = async (
     // Commit the batch
     await batch.commit();
 
-    res.status(201).json({ message: "Post-It created successfully", postItId });
+    res.status(201).json({ message: "Post-It created successfully", postItId , postItData});
   } catch (error) {
     console.error("Error creating Post-It:", error);
     res.status(500).json({ message: "Failed to create Post-It" });

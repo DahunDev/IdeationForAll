@@ -167,33 +167,46 @@ const Workboard = () => {
     navigate("/edit-account"); // TO DO: Change Navigate link to edit account page once fully functional
   };
 
-  const addNote = async () => {
-    try {
-      const response = await fetch(
-        `${getBackendUrl()}/api/postit/createPostIt`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${userToken}`,
-          },
-          body: JSON.stringify({ name: "New Post-It", boardId }),
-        },
-      );
 
-      if (response.ok) {
-        const newPostIt = await response.json();
-        setPostits((prevPostits) => [
-          ...prevPostits,
-          { id: newPostIt.postItId, name: "New Post-It" },
-        ]);
-      } else {
-        alert(`Failed to create post-it:, ${response.statusText}`);
+
+
+  const addNote = async () => {
+    // Prompt the user for the post-it name
+    const postItName = prompt("Enter the post-it name:");
+  
+    // If the user provided a name, proceed with creating the post-it
+    if (postItName) {
+      try {
+        const response = await fetch(
+          `${getBackendUrl()}/api/postit/createPostIt`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${userToken}`,
+            },
+            body: JSON.stringify({ name: postItName, boardId }),
+          }
+        );
+  
+        if (response.ok) {
+          const newPostIt = await response.json();
+          setPostits((prevPostits) => [
+            ...prevPostits,
+            newPostIt.postItData,
+          ]);
+        } else {
+          alert(`Failed to create post-it: ${response.statusText}`);
+        }
+      } catch (error) {
+        console.error("Error creating post-it:", error);
       }
-    } catch (error) {
-      console.error("Error creating post-it:", error);
+    } else {
+      alert("Post-it name cannot be empty!");
     }
   };
+  
+
 
   const deletePostit = async (postItId) => {
     try {
@@ -276,6 +289,12 @@ const Workboard = () => {
                 onClick={() => navigate("/workspace")}
               >
                 Go to Workspace Home
+              </button>
+              <button
+                className="workspace_button"
+                onClick={addNote} // Add the new button to create post-its
+              >
+                Add Post-It
               </button>
               {postits.map((item) => (
                 <PostIt
