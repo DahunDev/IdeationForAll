@@ -93,6 +93,11 @@ export async function updatePostItInFirestore(
       const postItData = postItDoc.data();
       if (!postItData) return;
 
+      // Check if the post-it is locked
+      if (postItData.locked && postItData.lockedBy !== userId) {
+        throw new Error(`Post-it is currently locked by ${postItData.lockedBy}`);
+      }
+
       // Authorization check: Only allow update if user is authorized
       let isAllowed = await isUserAuthorized(userId, postItDoc);
       if (!isAllowed) {
@@ -108,11 +113,61 @@ export async function updatePostItInFirestore(
       };
 
       // Perform the update inside the transaction
-      transaction.update(postItRef, newData);
+      transaction.update(postItRef, {
+        ...newData,
+        locked: false,
+        lockedBy: null,
+        lockedAt: null, // Timestamp of when it was locked
+      });
+    
     });
 
     console.log(`Post-it ${postItId} updated successfully by ${userId}`);
   } catch (error) {
     console.error("Error updating post-it:", error);
+  }
+}
+
+
+export async function lockPostIt(
+  postItId: string,
+  userId: string,
+): Promise<void> {
+  const postItRef = firebaseAdmin.firestore().collection("PostIts").doc(postItId);
+
+  try {
+    await firebaseAdmin.firestore().runTransaction(async (transaction) => {
+      const postItDoc = await transaction.get(postItRef);
+
+      if (!postItDoc.exists) {
+        throw new Error("Post-it does not exist");
+      }
+
+      const postItData = postItDoc.data();
+      if (!postItData) return;
+
+      // Check if the post-it is locked
+      if (postItData.locked && postItData.lockedBy !== userId) {
+        throw new Error(`Post-it is currently locked by ${postItData.lockedBy}`);
+      }
+
+      // Authorization check: Only allow update if user is authorized
+      let isAllowed = await isUserAuthorized(userId, postItDoc);
+      if (!isAllowed) {
+        throw new Error("Unauthorized update attempt");
+      }
+
+      // Lock the post-it for editing
+      transaction.update(postItRef, {
+        locked: true, // Set the post-it as locked
+        lockedBy: userId, // Assign the user locking it
+        lockedAt: Date.now(), // Timestamp of when it was locked
+      });
+    
+    });
+
+    console.log(`Post-it ${postItId} locked successfully by ${userId}`);
+  } catch (error) {
+    console.error("Error locking post-it:", error);
   }
 }
