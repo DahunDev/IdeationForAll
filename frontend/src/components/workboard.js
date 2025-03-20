@@ -167,7 +167,56 @@ const Workboard = () => {
     navigate("/edit-account"); // TO DO: Change Navigate link to edit account page once fully functional
   };
 
-
+  const addBoardMember = async () => {
+    const email = prompt("Enter the email of the user to invite:");
+    if (!email) return alert("Email cannot be empty.");
+  
+    try {
+      const response = await fetch(`${getBackendUrl()}/api/board/addMember`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userToken}`,
+        },
+        body: JSON.stringify({ boardId, email }),
+      });
+  
+      const result = await response.json();
+      if (response.ok) {
+        alert("User successfully added!");
+      } else {
+        alert(`Failed to add user: ${result.message}`);
+      }
+    } catch (error) {
+      console.error("Error adding user:", error);
+    }
+  };
+  
+  const removeBoardMember = async () => {
+    const email = prompt("Enter the email of the user to remove:");
+    if (!email) return alert("Email cannot be empty.");
+  
+    try {
+      const response = await fetch(`${getBackendUrl()}/api/board/removeMember`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userToken}`,
+        },
+        body: JSON.stringify({ boardId, email }),
+      });
+  
+      const result = await response.json();
+      if (response.ok) {
+        alert("User successfully removed!");
+      } else {
+        alert(`Failed to remove user: ${result.message}`);
+      }
+    } catch (error) {
+      console.error("Error removing user:", error);
+    }
+  };
+  
 
 
   const addNote = async () => {
@@ -296,6 +345,13 @@ const Workboard = () => {
               >
                 Add Post-It
               </button>
+              <button className="workspace_button" onClick={addBoardMember}>
+                Invite User
+              </button>
+              <button className="workspace_button" onClick={removeBoardMember}>
+                Remove User
+              </button>
+
               {postits.map((item) => (
                 <PostIt
                   postItId={item.postItId}
