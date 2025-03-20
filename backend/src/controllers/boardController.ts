@@ -390,3 +390,166 @@ export const getBoardList = async (
     return;
   }
 };
+
+
+export const addBoardMember = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  const userId = req.user?.uid;
+  const { boardId, email } = req.body;
+
+  if (!userId) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
+  if (!boardId || !email) {
+    res.status(400).json({ message: "boardId and email are required" });
+    return;
+  }
+
+  try {
+    await db.runTransaction(async (transaction) => {
+      // Fetch the board
+      const boardRef = db.collection("Boards").doc(boardId);
+      const boardDoc = await transaction.get(boardRef);
+
+      if (!boardDoc.exists) {
+        throw new Error("Board not found");
+      }
+
+      const boardData = boardDoc.data();
+      if (!boardData) {
+        throw new Error("Board data is undefined");
+      }
+
+      if (boardData.workspaceOrganizerId !== userId) {
+        throw new Error("Only the board owner can add members");
+      }
+
+      // Query Firestore to get the user by email
+      const userQuerySnapshot = await db
+        .collection("Users")
+        .where("email", "==", email)
+        .get();
+
+      if (userQuerySnapshot.empty) {
+        throw new Error("User not found with this email");
+      }
+
+      const userDoc = userQuerySnapshot.docs[0];
+      const newMemberId = userDoc.id;
+
+      console.log("NewMemberID: " + newMemberId);
+      console.log(boardData);
+      // Ensure SharedUserIds is an array before checking for inclusion
+      const sharedUserIds = Array.isArray(boardData.SharedUserIds) ? boardData.SharedUserIds : [];
+
+      if (sharedUserIds.includes(newMemberId)) {
+        throw new Error("User is already a member of this board");
+      }
+
+      // Update board to include new member
+      transaction.update(boardRef, {
+        SharedUserIds: [...sharedUserIds, newMemberId], // Ensures we spread a valid array
+      });
+
+
+      // Update user to include board in SharedBoards
+      const userRef = db.collection("Users").doc(newMemberId);
+      const userData = userDoc.data();
+      transaction.update(userRef, {
+        SharedBoards: [...(userData.SharedBoards || []), boardId],
+      });
+    });
+
+    res.status(200).json({
+      message: "User added successfully to board",
+      boardId,
+    });
+  } catch (error: any) {
+    console.error("Error adding board member:", error);
+    res.status(400).json({ message: error.message });
+  }
+};
+
+
+export const removeMember = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> => {
+  const userId = req.user?.uid;
+  const { boardId, email } = req.body;
+
+  if (!userId) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
+
+  if (!boardId || !email) {
+    res.status(400).json({ message: "boardId and email are required" });
+    return;
+  }
+
+  try {
+    await db.runTransaction(async (transaction) => {
+      // Fetch the board
+      const boardRef = db.collection("Boards").doc(boardId);
+      const boardDoc = await transaction.get(boardRef);
+
+      if (!boardDoc.exists) {
+        throw new Error("Board not found");
+      }
+
+      const boardData = boardDoc.data();
+      if (!boardData) {
+        throw new Error("Board data is undefined");
+      }
+
+      if (boardData.workspaceOrganizerId !== userId) {
+        throw new Error("Only the board owner can remove members");
+      }
+
+      // Query Firestore to get the user by email
+      const userQuerySnapshot = await db
+        .collection("Users")
+        .where("email", "==", email)
+        .get();
+
+      if (userQuerySnapshot.empty) {
+        throw new Error("User not found with this email");
+      }
+
+      const userDoc = userQuerySnapshot.docs[0];
+      const memberId = userDoc.id;
+
+      // Ensure SharedUserIds is an array before calling .includes()
+      const sharedUserIds = Array.isArray(boardData.SharedUserIds) ? boardData.SharedUserIds : [];
+
+      if (!sharedUserIds.includes(memberId)) {
+        throw new Error("User is not a member of this board");
+      }
+
+      // Remove user from board's SharedUserIds
+      const updatedSharedUserIds = sharedUserIds.filter((id: string) => id !== memberId);
+      transaction.update(boardRef, { SharedUserIds: updatedSharedUserIds });
+
+      // Remove board from user's SharedBoards (ensure it's an array)
+      const userRef = db.collection("Users").doc(memberId);
+      const userData = userDoc.data();
+      const sharedBoards = Array.isArray(userData?.SharedBoards) ? userData.SharedBoards : [];
+
+      const updatedSharedBoards = sharedBoards.filter((id: string) => id !== boardId);
+      transaction.update(userRef, { SharedBoards: updatedSharedBoards });
+    });
+
+    res.status(200).json({
+      message: "User removed successfully from board",
+      boardId,
+    });
+  } catch (error: any) {
+    console.error("Error removing board member:", error);
+    res.status(400).json({ message: error.message });
+  }
+};
