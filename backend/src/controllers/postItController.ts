@@ -65,6 +65,8 @@ export const createPostIt = async (
       associatedGroups: [], // No group assignment, so leave this empty
       position: position || { x: 0, y: 0 }, // Default position (if not provided)
       size: size || { width: 100, height: 250 }, // Default size
+      locked: false,
+      lockedBy: null
     };
 
     // Add the Post-It creation to the batch
@@ -350,6 +352,8 @@ interface PostItData {
   upvotedUsers?: Set<string>;
   downvotedUsers?: Set<string>;
   upvotes?: number;
+  locked?: boolean;               // Flag indicating whether the post-it is locked
+  lockedBy?: string | null;       // ID of the user who locked the post-it, if any
 }
 
 export const copyPostIt = async (
