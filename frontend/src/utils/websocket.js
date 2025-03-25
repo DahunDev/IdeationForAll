@@ -6,7 +6,7 @@ let socket;
 export const connectWebSocket = () => {
   const backendURL = getBackendUrl();
   console.log("Connect websocket url: " + backendURL);
-  
+
   // Use Socket.io to connect
   socket = io(backendURL);
 
@@ -30,4 +30,13 @@ export const sendUpdate = (postItId, updates, idToken) => {
   }
 
   socket.emit("updatePostIt", { postItId, updates, idToken });
+};
+
+export const sendPostItLock = (postItId, idToken) => {
+  if (!socket || !socket.connected) {
+    console.error("WebSocket is not connected.");
+    return;
+  }
+
+  socket.emit("lockPostIt", { postItId, idToken });
 };

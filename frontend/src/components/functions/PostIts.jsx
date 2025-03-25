@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { sendUpdate } from "../../utils/websocket";
+import { sendPostItLock, sendUpdate } from "../../utils/websocket";
 
 export default function PostIt({
   postItId,
@@ -12,10 +12,15 @@ export default function PostIt({
   font,
   position,
   size,
+  locked,
+  lockedBy,
   onClose,
 }) {
   const [move, setMove] = useState(false);
   const [text, setText] = useState(content); // Controlled state
+  const [isLocked, setIsLocked] = useState(locked || false); // Track if post-it is locked
+  const [lockedByUser, setLockedByUser] = useState(lockedBy || null); // Track who locked it
+  const [isEditing, setIsEditing] = useState(false);
 
   const postitRef = useRef();
   const timeoutRef = useRef(null);
@@ -28,7 +33,6 @@ export default function PostIt({
     postitRef.current.style.right = position.x + "px";
   }
 
-
   // Apply position when component mounts
   useEffect(() => {
     if (postitRef.current && position) {
@@ -37,19 +41,45 @@ export default function PostIt({
     }
   }, [position]); // Runs whenever `position` updates
 
+  // Handle page unload (when the user leaves the page)
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (isLocked && lockedByUser === idToken) {
+        sendUpdate(postItId, { content: text }, idToken); // Save content before unlocking
+        setIsLocked(false);
+        setLockedByUser(null);
+        setIsEditing(false); // Mark as done
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [idToken, postItId, text, isLocked, lockedByUser]);
 
   function mouseUp() {
     setMove(false);
     if (idToken) {
       sendUpdate(postItId, { position }, idToken); // Send update to backend
+      setIsEditing(false);
+      setIsLocked(false);
+      setLockedByUser(null);
       console.log("Send update, " + position);
-    }else{
+    } else {
       console.log("no idToken" + position);
     }
     console.log("sto moving, postid: " + postItId);
   }
   function mouseDown(e) {
     setMove(true);
+    if (idToken) {
+      sendPostItLock(postItId, idToken); // Send update to backend
+      setIsEditing(false);
+      setIsLocked(true);
+      setLockedByUser(idToken);
+    }
     const coordinates = postitRef.current.getBoundingClientRect();
     setDx(e.clientX - coordinates.x);
     setDy(e.clientY - coordinates.y);
@@ -70,7 +100,6 @@ export default function PostIt({
     }, 500); // Adjust debounce time as needed
   }
 
-
   function mouseMove(e) {
     if (move) {
       const fx = e.clientX - dx;
@@ -83,6 +112,24 @@ export default function PostIt({
     }
   }
 
+  function handleBlur(e) {
+    console.log("Blur");
+  }
+  function handleEdit() {
+    if (!idToken || isLocked) return;
+    sendPostItLock(postItId, idToken);
+    setIsEditing(true);
+    setIsLocked(true);
+    setLockedByUser(idToken);
+  }
+
+  function handleSave() {
+    if (!idToken || !isEditing) return;
+    sendUpdate(postItId, { content: text }, idToken);
+    setIsEditing(false);
+    setIsLocked(false);
+    setLockedByUser(null);
+  }
   return (
     <div className="post-it" ref={postitRef} onLoad={setPosition}>
       <div
@@ -98,11 +145,28 @@ export default function PostIt({
           &times;
         </div>
       </div>
-      <textarea
-        value={text} // Ensure it's a controlled input
-        onChange={handleTextChange}
-        // onBlur={handleBlur}
-      />
+
+      {isEditing ? (
+        <textarea
+          value={text} // Ensure it's a controlled input
+          onChange={handleTextChange}
+          // onBlur={handleBlur}
+          disabled={isLocked && lockedByUser !== idToken} // Disable if locked by another user
+        />
+      ) : (
+        <textarea
+          value={text}
+          disabled={!isEditing} // Disable editing when not in edit mode
+        />
+      )}
+
+      <div className="post-it-footer">
+        {!isEditing && !(isLocked && lockedByUser !== idToken) && <button onClick={handleEdit}>Edit</button>}
+        {isEditing && <button onClick={handleSave}>Done</button>}
+        {isLocked && lockedByUser !== idToken && (
+          <span className="lock-indicator">Locked by another user</span>
+        )}
+      </div>
     </div>
   );
 }
