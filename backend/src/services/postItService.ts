@@ -29,7 +29,7 @@ async function isUserAuthorized(
   postItDoc: FirebaseFirestore.DocumentSnapshot,
 ): Promise<boolean> {
   try {
-    // Fetch the PostIt document to check if the user is the poster
+    // Fetch the PostIt document to check if the user is the poster or board member
 
     if (!postItDoc.exists) {
       return false;
@@ -64,7 +64,10 @@ async function isUserAuthorized(
     if (boardData.workspaceOrganizerId === userId) {
       return true;
     }
-
+    // Check if the user is in the SharedUserIds array of the board
+    if (Array.isArray(boardData.SharedUserIds) && boardData.SharedUserIds.includes(userId)) {
+      return true;
+    }
     // If none of the checks pass, the user is not authorized
     return false;
   } catch (error) {

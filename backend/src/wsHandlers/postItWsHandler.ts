@@ -15,7 +15,7 @@ export function handlePostItWs(socket: Socket) {
 
         if (!postItId || !idToken) {
           throw new Error("Invalid lock request data");
-        }
+        } 
 
         const decodedToken = await authAdmin.verifyIdToken(idToken);
         const userId = decodedToken.uid; // Get the authenticated user ID

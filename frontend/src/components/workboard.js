@@ -40,7 +40,7 @@ const Workboard = () => {
               fetchUserBoards(token); // Fetch list of boards if no boardId is in the URL
             }
 
-                      // Now that the backend URL is set, connect WebSocket
+            // Now that the backend URL is set, connect WebSocket
             if (getBackendUrl()) {
               connectWebSocket(getBackendUrl()); // Make sure backendUrl is valid
             } else {
@@ -170,7 +170,7 @@ const Workboard = () => {
   const addBoardMember = async () => {
     const email = prompt("Enter the email of the user to invite:");
     if (!email) return alert("Email cannot be empty.");
-  
+
     try {
       const response = await fetch(`${getBackendUrl()}/api/board/addMember`, {
         method: "POST",
@@ -180,7 +180,7 @@ const Workboard = () => {
         },
         body: JSON.stringify({ boardId, email }),
       });
-  
+
       const result = await response.json();
       if (response.ok) {
         alert("User successfully added!");
@@ -191,21 +191,24 @@ const Workboard = () => {
       console.error("Error adding user:", error);
     }
   };
-  
+
   const removeBoardMember = async () => {
     const email = prompt("Enter the email of the user to remove:");
     if (!email) return alert("Email cannot be empty.");
-  
+
     try {
-      const response = await fetch(`${getBackendUrl()}/api/board/removeMember`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userToken}`,
+      const response = await fetch(
+        `${getBackendUrl()}/api/board/removeMember`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userToken}`,
+          },
+          body: JSON.stringify({ boardId, email }),
         },
-        body: JSON.stringify({ boardId, email }),
-      });
-  
+      );
+
       const result = await response.json();
       if (response.ok) {
         alert("User successfully removed!");
@@ -216,13 +219,11 @@ const Workboard = () => {
       console.error("Error removing user:", error);
     }
   };
-  
-
 
   const addNote = async () => {
     // Prompt the user for the post-it name
     const postItName = prompt("Enter the post-it name:");
-  
+
     // If the user provided a name, proceed with creating the post-it
     if (postItName) {
       try {
@@ -235,15 +236,12 @@ const Workboard = () => {
               Authorization: `Bearer ${userToken}`,
             },
             body: JSON.stringify({ name: postItName, boardId }),
-          }
+          },
         );
-  
+
         if (response.ok) {
           const newPostIt = await response.json();
-          setPostits((prevPostits) => [
-            ...prevPostits,
-            newPostIt.postItData,
-          ]);
+          setPostits((prevPostits) => [...prevPostits, newPostIt.postItData]);
         } else {
           alert(`Failed to create post-it: ${response.statusText}`);
         }
@@ -254,8 +252,6 @@ const Workboard = () => {
       alert("Post-it name cannot be empty!");
     }
   };
-  
-
 
   const deletePostit = async (postItId) => {
     try {
@@ -357,6 +353,8 @@ const Workboard = () => {
                   postItId={item.postItId}
                   boardID={item.boardID}
                   name={item.name}
+                  lockedBy={item.lockedBy || null}
+                  locked={item.locked || false}
                   userID={item.userID}
                   idToken={userToken}
                   content={item.content || ""}
