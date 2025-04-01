@@ -104,8 +104,24 @@ export default function PostIt({
     if (move) {
       const fx = e.clientX - dx;
       const fy = e.clientY - dy;
-      postitRef.current.style.left = fx + "px";
-      postitRef.current.style.top = fy + "px";
+      if (fx < 0) {
+        postitRef.current.style.left = 0 + "px";
+      }
+      else if (fx > window.screen.width - 310) {
+        postitRef.current.style.left = (window.screen.width - 310) + "px";
+      }
+      else {
+        postitRef.current.style.left = fx + "px";
+      }
+      if (fy < 0) {
+        postitRef.current.style.top = 0 + "px";
+      }
+      else if (fy > window.screen.height - 380) {
+        postitRef.current.style.top = (window.screen.height - 380) + "px";
+      }
+      else {
+        postitRef.current.style.top = fy + "px";
+      }
       position.x = fx;
       position.y = fy;
       console.log("post-it moved");
