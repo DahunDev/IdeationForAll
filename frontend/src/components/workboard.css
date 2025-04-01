@@ -109,6 +109,7 @@
   position: absolute;
   top: 30px;
   left: 50px;
+  user-select: none;
 }
 
 .post-it-header {
