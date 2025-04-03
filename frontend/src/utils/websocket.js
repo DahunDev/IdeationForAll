@@ -40,3 +40,13 @@ export const sendPostItLock = (postItId, idToken) => {
 
   socket.emit("lockPostIt", { postItId, idToken });
 };
+
+
+export const sendPostItVoteUpdate = (postItId, idToken, voteType) => {
+  if (!socket || !socket.connected) {
+    console.error("WebSocket is not connected.");
+    return;
+  }
+
+  socket.emit("updatePostItVotes", { postItId, idToken, voteType });
+};
