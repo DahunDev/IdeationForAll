@@ -1,0 +1,125 @@
+/* LoginPage.css */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #e4a662;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.toolbar_container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+}
+
+.head_container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: deepskyblue;
+    width: 100%;
+    padding: 10px;
+}
+
+.name_header {
+    text-align: center;
+    color: white;
+    font-family: Verdana;
+    flex-grow: 1;
+}
+
+.workspace_container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: gray;
+    border: 3px solid black;
+    width: 100%;
+    padding: 20px;
+}
+
+.login_section {
+    margin: 20px 0;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+    .login_section h2 {
+        margin-bottom: 20px;
+    }
+
+    .login_section form {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+.titletext {
+    padding: 9px;
+    font-size: 18px;
+    width: 80%;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.workspace_button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: yellow;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    width: 80%;
+    max-width: 250px;
+    margin: 15px auto;
+    display: block;
+}
+
+.account_button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: gray;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    max-width: 250px;
+    margin: 10px;
+}
+
+.goto-forget-password {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 0 10px;
+    width: 100%;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+}
