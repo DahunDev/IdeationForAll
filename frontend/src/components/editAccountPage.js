@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import "./editAccountPage.css";
 import { useNavigate } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import { getBackendUrl } from "../configs/serverSettings";
 import axios from "axios";
 import { auth } from "../configs/firebaseConfig";
+import "./editAccountPage.css";
 
 const EditAccountPage = () => {
     const [username, setUsername] = useState("");
@@ -30,10 +30,6 @@ const EditAccountPage = () => {
         e.preventDefault();
         try {
             const backendUrl = getBackendUrl();
-            if (!backendUrl) {
-                throw new Error("Backend URL is not set. Make sure server settings are loaded.");
-            }
-
             const response = await axios.put(
                 `${backendUrl}/api/user/updateUsername`,
                 { username },
@@ -42,12 +38,10 @@ const EditAccountPage = () => {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${token}`,
                     },
-                }
+                },
             );
-
             alert(response.data.message || "Username updated successfully!");
         } catch (error) {
-            console.error("Error updating username:", error);
             alert(error.response?.data?.message || "Failed to update username");
         }
     };
@@ -56,10 +50,6 @@ const EditAccountPage = () => {
         e.preventDefault();
         try {
             const backendUrl = getBackendUrl();
-            if (!backendUrl) {
-                throw new Error("Backend URL is not set. Make sure server settings are loaded.");
-            }
-
             const response = await axios.put(
                 `${backendUrl}/api/user/updateEmail`,
                 { newEmail },
@@ -68,60 +58,61 @@ const EditAccountPage = () => {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${token}`,
                     },
-                }
+                },
             );
-
             alert(
-                response.data.message || "Email updated successfully. Due to security policy, you need to sign in again!"
+                response.data.message ||
+                "Email updated. Due to security policy, please sign in again."
             );
         } catch (error) {
-            console.error("Error updating email:", error);
             alert(error.response?.data?.message || "Failed to update email");
         }
     };
 
     return (
-        <body className="board_body">
-            <div className="toolbar_container">
-                <div className="head_container">
-                    <h1 className="name_header">Ideation for All</h1>
-                    <button className="account_button" onClick={() => navigate("/workspace")}>
-                        Back to Workspace
+        <div className="edit-body">
+            <div className="toolbar-container">
+                <div className="head-container">
+                    <h1 className="name-header">Ideation for All</h1>
+                    <button
+                        className="account-button"
+                        onClick={() => navigate("/workspace")}
+                    >
+                        Workspace
                     </button>
                 </div>
-                <div className="workspace_container">
-                    <div className="edit_account_section">
-                        <h2>Update Name</h2>
+                <div className="workspace-container">
+                    <div className="edit-section">
+                        <h2>Update Username</h2>
                         <form onSubmit={handleUpdateUsername}>
                             <input
                                 type="text"
-                                placeholder="Username"
+                                placeholder="New Username"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 required
-                                className="titletext"
                             />
-                            <button type="submit" className="workspace_button">Update Username</button>
+                            <button type="submit">Update Username</button>
                         </form>
-                    </div>
-                    <div className="edit_account_section">
+
                         <h2>Change Email</h2>
                         <form onSubmit={handleChangeEmail}>
                             <input
                                 type="email"
-                                placeholder="New Email Address"
+                                placeholder="New Email"
                                 value={newEmail}
                                 onChange={(e) => setNewEmail(e.target.value)}
                                 required
-                                className="titletext"
                             />
-                            <button type="submit" className="workspace_button">Change Email</button>
+                            <button type="submit">Change Email</button>
                         </form>
                     </div>
                 </div>
             </div>
-        </body>
+        </div>
     );
 };
 
 export default EditAccountPage;
+
+
