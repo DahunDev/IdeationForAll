@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./RegisterPage.css";
 import { Link, useNavigate } from "react-router-dom";
 import { getBackendUrl } from "../configs/serverSettings";
+import classes from "./loginPage.module.css"; // reuse login styles
 
 const RegisterPage = () => {
     const [email, setEmail] = useState("");
@@ -25,10 +25,6 @@ const RegisterPage = () => {
 
         try {
             const backendUrl = getBackendUrl();
-            if (!backendUrl) {
-                throw new Error("Backend URL is not set. Make sure server settings are loaded.");
-            }
-
             const response = await axios.post(`${backendUrl}/api/auth/register`, {
                 username,
                 email,
@@ -36,31 +32,32 @@ const RegisterPage = () => {
             });
 
             if (response.status === 201) {
-                setSuccess("Registration successful! Redirecting to login...");
-                setTimeout(() => navigate("/login"), 2000);
+                setSuccess("Registration successful! Please log in.");
             }
         } catch (err) {
-            console.log(err);
             setError(err.response?.data?.message || "Registration failed. Please try again.");
         }
     };
 
     return (
-        <body className="board_body">
-            <div className="toolbar_container">
-                <div className="head_container">
-                    <h1 className="name_header">Ideation for All</h1>
-                    <button className="account_button" onClick={() => navigate("/login")}>
-                        Back to Login
+        <div className={classes.board_body}>
+            <div className={classes.toolbar_container}>
+                <div className={classes.head_container}>
+                    <h1 className={classes.name_header}>Ideation for All</h1>
+                    <button
+                        className={classes.account_button}
+                        onClick={() => navigate("/login")}
+                    >
+                        Login
                     </button>
                 </div>
-                <div className="workspace_container">
-                    <div className="register_section">
-                        <h2>Create Account</h2>
+                <div className={classes.workspace_container}>
+                    <div className={classes.login_section}>
+                        <h2>Register</h2>
                         <form onSubmit={handleRegister}>
                             <input
                                 type="email"
-                                className="titletext"
+                                className={classes.titletext}
                                 placeholder="Email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -68,7 +65,7 @@ const RegisterPage = () => {
                             />
                             <input
                                 type="text"
-                                className="titletext"
+                                className={classes.titletext}
                                 placeholder="Username"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
@@ -76,7 +73,7 @@ const RegisterPage = () => {
                             />
                             <input
                                 type="password"
-                                className="titletext"
+                                className={classes.titletext}
                                 placeholder="Password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
@@ -84,13 +81,15 @@ const RegisterPage = () => {
                             />
                             <input
                                 type="password"
-                                className="titletext"
+                                className={classes.titletext}
                                 placeholder="Re-type Password"
                                 value={repassword}
                                 onChange={(e) => setRepassword(e.target.value)}
                                 required
                             />
-                            <button type="submit" className="workspace_button">Create Account</button>
+                            <button type="submit" className={classes.workspace_button}>
+                                Create Account
+                            </button>
                         </form>
                         {error && <p style={{ color: "red" }}>{error}</p>}
                         {success && (
@@ -101,7 +100,7 @@ const RegisterPage = () => {
                     </div>
                 </div>
             </div>
-        </body>
+        </div>
     );
 };
 
