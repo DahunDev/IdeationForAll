@@ -1,4 +1,10 @@
 /* LoginPage.css */
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
 
 .loginPage * {
   box-sizing: border-box;
@@ -7,14 +13,19 @@
 }
 
 .board_body {
-  font-family: Arial, sans-serif;
-  background-color: #e4a662;
-  text-align: center;
-  align-items: flex-start;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+    font-family: Arial, sans-serif;
+    background-color: #e4a662;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
 }
+
 
 .toolbar_container {
   display: flex;

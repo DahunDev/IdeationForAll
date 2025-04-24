@@ -2,7 +2,7 @@ import { Socket } from "socket.io";
 import { debouncedUpdatePostIt } from "../utils/debounceUtils";
 import { PostItUpdate } from "../types/customTypes";
 import { authAdmin } from "../configs/firebaseConfig";
-import { lockPostIt } from "../services/postItService";
+import { lockPostIt, updatePostItVotes } from "../services/postItService";
 
 export function handlePostItWs(socket: Socket) {
   console.log(`Client connected: ${socket.id}`);
@@ -78,4 +78,43 @@ export function handlePostItWs(socket: Socket) {
     console.log(`Client disconnected: ${socket.id}`);
     debouncedUpdatePostIt.flush();
   });
+
+
+  socket.on(
+    "updatePostItVotes",
+    async (data: { postItId: string; voteType: 'upvote' | 'downvote' | 'cancelUpvote' | 'cancelDownvote'; idToken: string }, callback) => {
+      try {
+        const { postItId, voteType, idToken } = data;
+  
+        if (!postItId || !voteType || !idToken) {
+          throw new Error("Invalid post-it vote update data");
+        }
+  
+        const decodedToken = await authAdmin.verifyIdToken(idToken);
+        const userId = decodedToken.uid; // Get the authenticated user ID
+  
+        // Update the Post-it votes in Firestore and get the updated vote info
+        const updatedVoteData = await updatePostItVotes(postItId, voteType, userId);
+  
+        if (callback) {
+          // Send the updated vote data back to the client
+          callback({
+            success: true,
+            message: "Update queued successfully",
+            updatedData: updatedVoteData,  // Send updated vote data
+          });
+        }
+      } catch (error) {
+        console.error("Error handling updatePostIt:", error);
+  
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+  
+        if (callback) {
+          callback({ success: false, message: errorMessage });
+        }
+      }
+    }
+  );
+  
+
 }
