@@ -1,99 +1,90 @@
-/* EditAccountPage.css */
+/* editAccountPage.css */
 
-* {
-    box-sizing: border-box;
-}
-
-.board_body {
+body, html {
+    height: 100%;
+    margin: 0;
+    padding: 0;
     font-family: Arial, sans-serif;
-    background-color: #e4a662;
-    text-align: center;
-    align-items: flex-start;
-    min-height: 100vh;
 }
 
-.toolbar_container {
+.edit-body {
+    background-color: #e4a662;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
+    align-items: center;
     justify-content: flex-start;
-    align-items: flex-start;
-    min-width: 100vw;
+    text-align: center;
+}
+
+.toolbar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     width: 100%;
 }
 
-.head_container {
+.head-container {
     display: flex;
-    flex-direction: row;
-    text-align: center;
     justify-content: space-between;
+    align-items: center;
     background-color: deepskyblue;
-    min-width: 100vw;
+    width: 100%;
     padding: 10px;
 }
 
-.name_header {
-    text-align: center;
+.name-header {
     color: white;
     font-family: Verdana;
+    flex-grow: 1;
+    text-align: center;
 }
 
-.workspace_container {
+.account-button {
+    background-color: gray;
+    color: black;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.workspace-container {
     display: flex;
-    flex-direction: column;
-    text-align: center;
     justify-content: center;
+    align-items: center;
     background-color: gray;
     border: 3px solid black;
-    min-width: 100vw;
     padding: 20px;
+    width: 100%;
 }
 
-.edit_account_section {
-    margin: 20px 0;
-    background: #fff;
+.edit-section {
+    background-color: white;
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     width: 50%;
-    margin: auto;
-    text-align: center;
+    max-width: 400px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-.titletext {
-    padding: 9px;
-    font-size: 18px;
-    width: 100%;
-    margin-bottom: 10px;
-}
+    .edit-section input {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        margin: 10px 0;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
 
-.workspace_button {
-    align-items: center;
-    justify-content: center;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    background-color: yellow;
-    color: black;
-    border: none;
-    border-radius: 5px;
-    width: 100%;
-    max-width: 250px;
-    margin: 10px auto;
-    display: block;
-}
+    .edit-section button {
+        width: 100%;
+        padding: 10px;
+        font-size: 16px;
+        background-color: yellow;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
 
-.account_button {
-    align-items: center;
-    justify-content: center;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    background-color: gray;
-    color: black;
-    border: none;
-    border-radius: 5px;
-    width: 100%;
-    max-width: 250px;
-    margin: 10px auto;
-    display: block;
-}
